@@ -1,7 +1,19 @@
-function [x1,x2,X1,X2,Yt,p1,p2 ] = CylinderOutline( img,ROI )
+function [x1,x2,X1,X2,Yt,p1,p2 ] = CylinderOutline( img,ROI,varargin )
 % get the outline of the cylinder from top image
 %img: the image need to fit
 %ROI: [Xmin,Ymin,Xmax,Ymax] region where there is atom
+
+Extrapolate=1;
+
+for i =1:length(varargin)
+    if ischar(varargin{i})
+    switch varargin{i}
+        case 'Extrapolate'
+            Extrapolate=varargin{i+1};    
+    end
+    end
+end
+
 
 Rx = @(p,x) real(sqrt(p(2)^2- (x-p(1)).^2 ))*p(3);
 % try
@@ -25,5 +37,13 @@ p2=polyfit(Y,X2,1);
 Yt=1:size(img,1);
 x1=polyval(p1,Yt);
 x2=polyval(p2,Yt);
+
+if (~Extrapolate)
+x1(Yt<ROI(2))=x1(Yt==ROI(2));
+x1(Yt>ROI(4))=x1(Yt==ROI(4));
+x2(Yt<ROI(2))=x2(Yt==ROI(2));
+x2(Yt>ROI(4))=x2(Yt==ROI(4));
+end
+
 end
 

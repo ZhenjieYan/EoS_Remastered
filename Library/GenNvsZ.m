@@ -12,6 +12,7 @@ function [n,z] = GenNvsZ( Img,ROI1,ROI2,pixelsize,z0,ellipticity,varargin)
 
 ShowOutline=false;
 Nmethod=0;
+OutlineExtrapolate=1;
 
 for i =1:length(varargin)
     if ischar(varargin{i})
@@ -20,12 +21,14 @@ for i =1:length(varargin)
             ShowOutline=varargin{i+1};    
         case 'Nmethod'
             Nmethod=varargin{i+1};
+        case 'OutlineExtrapolate'
+            OutlineExtrapolate=varargin{i+1};
     end
     end
 end
 
 
-[x1,x2,~,~,Yt,p1,p2 ]=CylinderOutline( Img,ROI2 );
+[x1,x2,~,~,Yt,p1,p2 ]=CylinderOutline( Img,ROI2,'Extrapolate',OutlineExtrapolate);
 %x1=round(x1);x2=round(x2);
 
 % check if ShowOutline is asked

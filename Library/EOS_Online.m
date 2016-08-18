@@ -39,6 +39,7 @@ IfSuperSampling=0;
 Nmethod=0;
 pixellength=1.44*10^-6; %in m
 IfCleanImage=0;
+OutlineExtrapolate=1;
 
 for i =1:length(varargin)
     if ischar(varargin{i})
@@ -114,6 +115,8 @@ for i =1:length(varargin)
                 pixellength=varargin{i+1};
             case 'IfCleanImage'
                 IfCleanImage=varargin{i+1};
+            case 'OutlineExtrapolate'
+                OutlineExtrapolate=varargin{i+1};
         end
     end
 end
@@ -195,7 +198,7 @@ if IfSuperSampling
 end
 
 %Get the position of the tail, and tailor the tail to be a flat line
-[n,z]=GenNvsZ( Nimg,ROI1,ROI2,pixellength,0,1 ,'ShowOutline',ShowOutline,'Nmethod',Nmethod);
+[n,z]=GenNvsZ( Nimg,ROI1,ROI2,pixellength,0,1 ,'ShowOutline',ShowOutline,'Nmethod',Nmethod,'OutlineExtrapolate',OutlineExtrapolate);
 
 
 if CropTail
