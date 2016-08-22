@@ -8,10 +8,10 @@ pixellength=0.7*10^-6; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.6;
+Fudge=1.76;
 kB=1.380e-23;
 Nsat=inf;
-load('/Users/Zhenjie/Data/Processed/2016-08-15/2016-08-15Set19.mat')
+load('/Users/Zhenjie/Data/Processed/2016-08-15/2016-08-15Set9.mat')
 warning ('off','all')
 %% Get the profile for all of them
 nS1list={};
@@ -20,8 +20,8 @@ Z0S1list=[];
 for i=1:length(imglistS1Final)
     disp(i);
     [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[850,350,1300,1500],...
-    'ROI2',[850,820,1300,920],'TailRange',[500,1200],'ShowOutline',0,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
-    'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',1,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,'IfCleanImage',1,'OutlineExtrapolate',0);
+    'ROI2',[850,750,1300,1000],'TailRange',[500,1200],'ShowOutline',0,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',1,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,'IfCleanImage',1);
     nS1list=[nS1list;nsort/1e18];
     Z0S1=zcor.z0*pixellength/1e-6;
     Z0S1list=[Z0S1list;Z0S1];
@@ -93,8 +93,8 @@ VS2=0.5*mli*omega^2*(ZS2*1e-6).^2/hh;
 EFS1=(1/(2*mli))*hbar^2*(6*pi^2*abs(nS1)*1e18).^(2/3).*sign(nS1)/hh;
 EFS2=(1/(2*mli))*hbar^2*(6*pi^2*abs(nS2)*1e18).^(2/3).*sign(nS2)/hh;
 
-Nbin=180;
-VGrid=linspace(0,0.6e4,Nbin+1);
+Nbin=150;
+VGrid=linspace(0,0.8e4,Nbin+1);
 [VS1BinV,EFS1BinV]=BinGrid(VS1,EFS1,VGrid,0);
 mask=isnan(VS1BinV);
 VS1BinV(mask)=[];
@@ -124,7 +124,7 @@ Vprofile.EFS1=EFS1BinV;
 Vprofile.EFS2=EFS2BinV;
 Vprofile.Z=ZBinV;
 %%
-Vth=1300;
+Vth=2200;
 mask=VBinZ>Vth;
 
 Vfit=VBinZ(mask);
@@ -133,7 +133,7 @@ nS1fit=nS1BinZ(mask);
 P=IdealGasFit( Vfit,nS1fit,[5000,500,1] );
 P(3)
 %%
-P=IdealGasFitwoFudge( Vfit,nS1fit,[3000,500] )
+P=IdealGasFitwoFudge( Vfit,nS1fit,[3000,300] )
 
 %%
 mu_trap_S1=P(1)
@@ -147,13 +147,13 @@ mu_localZ=mu_trap_S1-VBinZ;
 beta_mu_localZ=mu_localZ/T_trap;
 KappaFitZ=interp1(beta_mu_T,KappaTildeT,beta_mu_localZ,'spline');
 % get the kappa from image profile
-[KappaTildeS1BinV,~]=FiniteD( VBinV,VBinV*0,EFS1BinV,EFS1BinV*0,10);
+[KappaTildeS1BinV,~]=FiniteD( VBinV,VBinV*0,EFS1BinV,EFS1BinV*0,5);
 KappaTildeS1BinV=-KappaTildeS1BinV;
 plot(VBinV,KappaTildeS1BinV,'bo');
 hold on
 plot(VBinZ,KappaFitZ,'k-')
 hold off
-xlim([0,6e3])
+xlim([0,13e3])
 ylabel('\kappa/\kappa_0');
 xlabel('U (Hz)');
 %%
@@ -161,7 +161,7 @@ xlabel('U (Hz)');
 [KappaTildeS2BinV,~]=FiniteD( VBinV,VBinV*0,EFS2BinV,EFS2BinV*0,5);
 KappaTildeS2BinV=-KappaTildeS2BinV;
 plot(VBinV,KappaTildeS2BinV,'ro');
-xlim([0,6e3])
+xlim([0,8e3])
 ylabel('\kappa/\kappa_0');
 xlabel('U (Hz)');
 %%
@@ -173,13 +173,46 @@ plot(VBinV,nS1BinV,'b.','DisplayName','Majority');
 plot(VBinV,nS2BinV,'r.','DisplayName','Minority');
 plot(VBinV,n_ideal_BinV+0.6150*nS2BinV,'g-','linewidth',1,'DisplayName','ENS EoS, A=-0.615');
 hold off
-xlim([0,6000])
+xlim([0,12000])
 legend show
 
 ylabel('n (um^{-3})');
 xlabel('U (Hz)');
 %%
 Imbalance=max(nS2BinV)/max(nS1BinV)
+%% Get the compressibility of minority: V=V+AEF_1
+A=-0.615;
+VmBinV=VBinV+A*EFS1BinV;
+T_Tilde_S2=T_trap./EFS2BinV;
+plot(VBinV,T_Tilde_S2);
 
-%%
-save('Result0815Set19.mat','T_trap','mu_trap_S1','VBinV','nS1BinV','nS2BinV','KappaTildeS1BinV','KappaTildeS2BinV','EFS1BinV','EFS2BinV')
+[KappaTildeS2BinVMod,~]=FiniteD( VmBinV,VmBinV*0,EFS2BinV,EFS2BinV*0,5);
+KappaTildeS2BinVMod=-KappaTildeS2BinVMod;
+
+scatter(VBinV,KappaTildeS2BinVMod)
+%% Compare the compressibility of minority with the EoS
+scatter(T_Tilde_S2(5:end),KappaTildeS2BinVMod(5:end),'DisplayName','Minority');
+xlim([0,2]);ylim([0,1.5])
+mstar=1.2;
+hold on
+plot(TTildeT,KappaTildeT*mstar,'k-','DisplayName','m*/m=1.2')
+plot(TTildeT,KappaTildeT,'k--','DisplayName','Ideal EoS')
+hold off
+
+xlabel('T/T_F');ylabel('\kappa/\kappa_0 (modified)','DisplayName','m*/m=1.0')
+legend('show')
+%% Compare the majority compressibility with EoS
+TTildeS1=T_trap./EFS1BinV;
+scatter(TTildeS1,KappaTildeS1BinV);
+xlim([0,2]);ylim([0,1.5])
+hold on
+plot(TTildeT,KappaTildeT,'k--','DisplayName','Ideal EoS')
+hold off
+legend('show')
+xlabel('T/T_F');ylabel('\kappa/\kappa_0 (modified)','DisplayName','m*/m=1.0')
+
+% %% Check single shot
+% [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS2Final{2},'ROI1',[850,550,1300,1100],...
+%     'ROI2',[850,830,1300,930],'TailRange',[700,1000],'ShowOutline',1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+%     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',1,'Nsat',Nsat,'ShowPlot',1,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',4,'IfBin',0,'BinGridSize',100,'IfCleanImage',1,'OutlineExtrapolate',0);
+%     nS2list=[nS2list;nsort/1e18];
