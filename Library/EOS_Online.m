@@ -254,6 +254,7 @@ if IfHalf
     Zsort=Zsort(Zsort>0);
 end
 
+
 switch KappaMode
     case 0
         Kt=GetKappavsVPolyPoints(nsort,Vsort,Points,PolyOrder,'Smooth',ifsmooth);
@@ -342,7 +343,8 @@ if FinalPlot
     %Plot Kt vs V
     subplot(3,2,4);
     scatter(Vsort/hh,Kt,'filled');
-    ylim([0,5])
+    ylim([0,3.5])
+    xlim([0 8000])
     xlabel('V (Hz)');
     ylabel('\kappa/\kappa_0');
     title('\kappa/\kappa_0 vs V');
