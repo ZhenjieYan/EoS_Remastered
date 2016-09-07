@@ -2,10 +2,10 @@
 addpath('../Library');
 warning('off','all');
 %%
-filename='/Users/Zhenjie/Data/2016-07-25/07-25-2016_19_27_25_TopB.fits';
+filename='/Volumes/Raw Data/Images/2016/2016-08/2016-08-29/08-29-2016_22_49_22_TopA.fits';
 [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EF]=EOS_Online( filename ,...
     'ShowOutline',1,'KappaMode',5,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
-    'Fudge',2.1,'BGSubtraction',0,'IfFitExpTail',1,'Nsat',295,'IfBin',0,'BinGridSize',160,'pixellength',0.7e-6,'SM',30);
+    'Fudge',1.55,'BGSubtraction',0,'IfFitExpTail',1,'Nsat',inf,'IfBin',1,'BinGridSize',160,'pixellength',0.7e-6,'SM',4,'CleanImage',1);
 
 %%
 d=figure();

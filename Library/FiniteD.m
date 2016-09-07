@@ -8,7 +8,7 @@ for i=1:N
     k1=max(1,i-SD);
     k2=min(N,i+SD);
     %Out(i)=(y(k2)-y(k1))/(x(k2)-x(k1));
-    if k2-k1>1
+    if (k2-k1)==SD*2 %k2-k1>1
         k0=round((k1+k2)/2);
         X=[x(k1),x(k0),x(k2)];
         Y=[y(k1),y(k0),y(k2)];

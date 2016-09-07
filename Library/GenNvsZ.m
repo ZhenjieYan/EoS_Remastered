@@ -32,6 +32,10 @@ end
 %x1=round(x1);x2=round(x2);
 
 % check if ShowOutline is asked
+% get the ROI part for colorscale
+ImgROI2=Img(ROI2(2):ROI2(4),ROI2(1):ROI2(3));
+ImgROI2=ImgROI2(:);
+
 if ShowOutline
     h=figure;
     imagesc(Img);
@@ -42,7 +46,7 @@ if ShowOutline
     vector1=x1(end)-x1(1)+(Yt(end)-Yt(1))*1i;
     vector2=(x2(end)-x2(1))+(Yt(end)-Yt(1))*1i;
     theta=abs(angle(vector1/vector2))/pi*180;
-    caxis([-10,45]);
+    caxis([min(ImgROI2),max(ImgROI2)]);
     questdlg(['I am just giving you some time to check the out line, press any key to continue, the cone angle is',num2str(theta)]);
     pause();
     close(h)

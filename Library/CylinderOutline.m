@@ -9,7 +9,8 @@ for i =1:length(varargin)
     if ischar(varargin{i})
     switch varargin{i}
         case 'Extrapolate'
-            Extrapolate=varargin{i+1};    
+            Extrapolate=varargin{i+1}; 
+        
     end
     end
 end
@@ -39,10 +40,14 @@ x1=polyval(p1,Yt);
 x2=polyval(p2,Yt);
 
 if (~Extrapolate)
-x1(Yt<ROI(2))=x1(Yt==ROI(2));
-x1(Yt>ROI(4))=x1(Yt==ROI(4));
-x2(Yt<ROI(2))=x2(Yt==ROI(2));
-x2(Yt>ROI(4))=x2(Yt==ROI(4));
+    
+    x1((ROI(2)+1):(ROI(4)-1))=X1;
+    x2((ROI(2)+1):(ROI(4)-1))=X2;
+    
+    x1(Yt<=ROI(2))=x1(Yt==(ROI(2)+1));
+    x1(Yt>ROI(4))=x1(Yt==(ROI(4)-1));
+    x2(Yt<ROI(2))=x2(Yt==(ROI(2)+1));
+    x2(Yt>ROI(4))=x2(Yt==(ROI(4)-1));
 end
 
 end
