@@ -361,13 +361,13 @@ axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.5,0.6]);
 plot(ZS2BinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
 hold on
 plot(ZS1BinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1)
-line([Zcr1,Zcr1],[-1000,1000],'linewidth',0.5,'color','k');
-line([Zcr2,Zcr2],[-1000,1000],'linewidth',0.5,'color','k');
-set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0,0.1,0.2],'Xtick',[-200,-100,0,100,200])
+% line([Zcr1,Zcr1],[-1000,1000],'linewidth',0.5,'color','k');
+% line([Zcr2,Zcr2],[-1000,1000],'linewidth',0.5,'color','k');
+set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0,0.1,0.2,0.3,0.4],'Xtick',[-200,-100,0,100,200])
 hold off
 
 xlim([-250,250]);
-ylim([-0.05,0.25]);
+ylim([-0.05,0.4]);
 %% T/TF plot
 figure1 = figure;
 axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.5,0.6]);
