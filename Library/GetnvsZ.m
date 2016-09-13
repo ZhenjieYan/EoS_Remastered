@@ -9,12 +9,14 @@ for i =1:length(varargin)
     switch varargin{i}
         case 'Nmethod'
             Nmethod=varargin{i+1};
+        case 'Zaveraging'
+            Zaveraging=varargin{i+1};
     end
     end
 end
 
 
-Z=Y(4:end-3);
+Z=Y(1+Zaveraging:end-Zaveraging);
 N=length(Z);
 n=Z*0;
 
@@ -23,8 +25,9 @@ for i=1:N
     x2=X2(Z(i));
     x1=X1(Z(i));
     D=x2-x1;
-    Nx=(img(Z(i),round(x1):round(x2))+img(Z(i)+1,round(x1):round(x2))+img(Z(i)-1,round(x1):round(x2)))/3;
-    N=sum(Nx);
+    %Nx=(img(Z(i),round(x1):round(x2))+img(Z(i)+1,round(x1):round(x2))+img(Z(i)-1,round(x1):round(x2)))/3;
+    Nxavg=sum(img((Z(i)-Zaveraging):(Z(i)+Zaveraging),round(x1):round(x2)),2);
+    N=mean(sum(Nxavg,2));
     Volume=pi/4*D^2*ellipticity*pixelsize^3;
     n(i)=N/Volume;
 end

@@ -23,6 +23,8 @@ for i =1:length(varargin)
             Nmethod=varargin{i+1};
         case 'OutlineExtrapolate'
             OutlineExtrapolate=varargin{i+1};
+        case 'Zaveraging';
+            Zaveraging=varargin{i+1};
     end
     end
 end
@@ -54,7 +56,7 @@ end
 
 %check end
 Y=ROI1(2):ROI1(4);
-[n,Z] = GetnvsZ( Img,x1,x2,Y,pixelsize,ellipticity,'Nmethod',Nmethod);
+[n,Z] = GetnvsZ( Img,x1,x2,Y,pixelsize,ellipticity,'Nmethod',Nmethod,'Zaveraging',Zaveraging);
 n=n';
 z=Z'-z0;
 end

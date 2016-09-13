@@ -40,6 +40,10 @@ Nmethod=0;
 pixellength=1.44*10^-6; %in m
 IfCleanImage=0;
 OutlineExtrapolate=1;
+IfLookUpTable=0;
+ImagingTime=10;
+Zaveraging=1;
+omega=23.9*2*pi; %in rad/s
 
 for i =1:length(varargin)
     if ischar(varargin{i})
@@ -117,6 +121,14 @@ for i =1:length(varargin)
                 IfCleanImage=varargin{i+1};
             case 'OutlineExtrapolate'
                 OutlineExtrapolate=varargin{i+1};
+            case 'IfLookUpTable'
+                IfLookUpTable=varargin{i+1};
+            case 'ImagingTime'
+                ImagingTime=varargin{i+1};
+            case 'Zaveraging'
+                Zaveraging=varargin{i+1};
+            case 'omega'
+                omega=varargin{i+1};
         end
     end
 end
@@ -125,7 +137,7 @@ end
 mli=9.988346*10^-27;  %kg
 hbar=1.0545718*10^(-34); %SI
 hh=2*pi*hbar;%SI Planck constant
-omega=23.9*2*pi; %in rad/s
+
 
 sigma0=0.215*10^-12/2; %in m^2
 
@@ -141,10 +153,11 @@ else
     if size(Input,3)==1
         Nimg=Input;
     else
-        Nimg=AtomNumber( Input,pixellength^2,sigma0, Nsat);
-        Nimg(isnan(Nimg))=0;
-        Nimg(Nimg==inf)=0;
-        Nimg(Nimg==-inf)=0;
+        if ~IfLookUpTable
+            Nimg=AtomNumber( Input,pixellength^2,sigma0, Nsat);
+        else
+            Nimg=AtomNumberLUT( Input,pixellength^2,sigma0, Nsat, ImagingTime);
+        end
     end
 end
 %Get the ROI1
@@ -180,13 +193,12 @@ if IfFourierFilter
 end
 
 if IfCleanImage
-    Nimg=CleanImage(Nimg);
+    Nimg(ROI1(2):ROI1(4),ROI1(1):ROI1(3))=CleanImage(Nimg(ROI1(2):ROI1(4),ROI1(1):ROI1(3)));
 end
-
-
 Nimg(isnan(Nimg))=0;
 Nimg(Nimg==inf)=0;
 Nimg(Nimg==-inf)=0;
+
 
 if IfSuperSampling
     Nimg=SuperSampling( Nimg,2,1)/4;
@@ -198,7 +210,7 @@ if IfSuperSampling
 end
 
 %Get the position of the tail, and tailor the tail to be a flat line
-[n,z]=GenNvsZ( Nimg,ROI1,ROI2,pixellength,0,1 ,'ShowOutline',ShowOutline,'Nmethod',Nmethod,'OutlineExtrapolate',OutlineExtrapolate);
+[n,z]=GenNvsZ( Nimg,ROI1,ROI2,pixellength,0,1 ,'ShowOutline',ShowOutline,'Nmethod',Nmethod,'OutlineExtrapolate',OutlineExtrapolate,'Zaveraging',Zaveraging);
 
 
 if CropTail
