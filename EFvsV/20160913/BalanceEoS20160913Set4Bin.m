@@ -8,10 +8,10 @@ pixellength=0.7*10^-6*3; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.46*1.2968;
+Fudge=1.6737;
 kB=1.380e-23;
 Nsat=770;
-load('/Users/Zhenjie/Data/Processed/2016-09-12/2016-09-12Set2Bin.mat')
+load('/Users/Zhenjie/Data/Processed/2016-09-13/2016-09-13Set4Bin.mat')
 warning ('off','all')
 %% Get the profile for all of them
 nS1list={};
@@ -19,12 +19,12 @@ ZS1list={};
 Z0S1list=[];
 ZS1sortlist={};
 EFS1List={};
-for i=1:8%length(imglistS1Final)
+for i=1:length(imglistS1Final)
     disp(i);
     [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[233,267,437,607],...
-    'ROI2',[233,419,437,467],'TailRange',round([1000,1650]/3),'ShowOutline',0,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    'ROI2',[233,416,437,475],'TailRange',round([1000,1650]/3),'ShowOutline',0,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
-    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);
+    'IfCleanImage',1,'OutlineExtrapolate',0,'IfLookUpTable',1);
     nS1list=[nS1list;nsort/1e18];%
     Z0S1=zcor.z0*pixellength/1e-6;
     Z0S1list=[Z0S1list;Z0S1];
@@ -37,17 +37,21 @@ end
 nS2list={};
 ZS2list={};
 Z0S2list=[];
-for i=1:8%length(imglistS1Final)
+ZS2sortlist={};
+EFS2List={};
+for i=1:length(imglistS1Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',round([700,800,1310,1820]/3),...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS2,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',round([700,800,1310,1820]/3),...
     'ROI2',[233,419,437,467],'TailRange',round([1000,1650]/3),'ShowOutline',0,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
-    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);
+    'IfCleanImage',1,'OutlineExtrapolate',0,'IfLookUpTable',1);
     nS2list=[nS2list;nsort/1e18];
     Z0S2=zcor.z0*pixellength/1e-6;
     Z0S2list=[Z0S2list;Z0S2];
     ZS2=Zsort/1e-6+Z0S2;
     ZS2list=[ZS2list;ZS2];
+    ZS2sortlist=[ZS2sortlist;Zsort];
+    EFS2List=[EFS2List,EFS2];
 end
 %%
 nS1=[];
@@ -109,7 +113,7 @@ VS2=0.5*mli*omega^2*(ZS2*1e-6).^2/hh;
 EFS1=(1/(2*mli))*hbar^2*(6*pi^2*abs(nS1)*1e18).^(2/3).*sign(nS1)/hh;
 EFS2=(1/(2*mli))*hbar^2*(6*pi^2*abs(nS2)*1e18).^(2/3).*sign(nS2)/hh;
 
-Nbin=300;
+Nbin=200;
 VGrid=linspace(0,0.8e4,Nbin+1);
 [VS1BinV,EFS1BinV]=BinGrid(VS1,EFS1,VGrid,0);
 mask=isnan(VS1BinV);
@@ -207,7 +211,7 @@ P1T=P./P0;
 plot(VBinV,P1T);ylim([0,4])
 %% fit the pressure with Mark's EoS to get temperature
 load('/Users/Zhenjie/Data/Processed/Mark/MarkEoS.mat')
-Vth1=500;
+Vth1=300;
 Vth2=900;
 mask1=VBinV>Vth1;mask2=VBinV<Vth2;
 mask=mask1 & mask2;
@@ -222,10 +226,11 @@ T=mean(TSample)
 plot(VSample,TSample,'r.')
 ylabel('k_B T (Hz)');xlabel('V(Hz)');
 title('Temperature get from P/P_0');
+ylim([0,1.2*max(TSample)])
 %%
 %% Get the mu for the trap from mark's EoS
 
-T_trap=T;
+T_trap=218;
 Vmax=1500;
 mask=VS1BinV<Vmax;
 Vfitmu=VS1BinV(mask);
@@ -246,7 +251,7 @@ mu_fitmu(mask)=[];
 
 scatter(Vfitmu,mu_fitmu);
 
-mu_trap=mean(mu_fitmu)
+mu_trap=mean(mu_fitmu);
 
 
 %% Create the unfolded kappa vs Z
@@ -254,17 +259,23 @@ mu_trap=mean(mu_fitmu)
 ZList=[];
 KappaList=[];
 Iteration=10;
+Zoffset=-0e-6;
+
 for i=1:Iteration*length(ZS1sortlist)
     % first bin the data
     %Zgrid=linspace(-200,200,Nbin+1);
     %Zgrid=linspace(-sqrt(200),sqrt(200),Nbin+1);Zgrid=sign(Zgrid).*Zgrid.^2;
+    
     j=mod(i,length(ZS1sortlist));
     if j==0
         j=length(ZS1sortlist);
     end
-    Nbin=round(rand()*700+700);
-    Zgrid=sign(linspace(sign(min(ZS1sortlist{j}))*min(ZS1sortlist{j}).^2,sign(max(ZS1sortlist{j}))*max(ZS1sortlist{j}).^2,Nbin+1)).*sqrt(abs(linspace(sign(min(ZS1sortlist{j}))*min(ZS1sortlist{j}).^2,sign(max(ZS1sortlist{j}))*max(ZS1sortlist{j}).^2,Nbin+1)));
-    [ZBintemp,EFBintemp,~,~]=BinGrid(ZS1sortlist{j},EFS1List{j}/hh,Zgrid,0);
+    Nbin=round(rand()*200+200);
+    
+    Z_vec=ZS1sortlist{j}-Zoffset;
+    
+    Zgrid=sign(linspace(sign(min(Z_vec))*min(Z_vec).^2,sign(max(Z_vec))*max(Z_vec).^2,Nbin+1)).*sqrt(abs(linspace(sign(min(Z_vec))*min(Z_vec).^2,sign(max(Z_vec))*max(Z_vec).^2,Nbin+1)));
+    [ZBintemp,EFBintemp,~,~]=BinGrid(Z_vec,EFS1List{j}/hh,Zgrid,0);
 
     % then divide the data into two group Z>0 and Z<0
     Ztempplus=ZBintemp(ZBintemp>=0);EFtempplus=EFBintemp(ZBintemp>=0);
@@ -290,7 +301,7 @@ plot(ZList,KappaList,'r.','markersize',20)
 ylim([-1,3.5]);
 
 %%
-Nbin=150;
+Nbin=200;
 Zgrid1=linspace(-(250^2),250^2,300+1);
 Zgrid1=sqrt(abs(Zgrid1)).*sign(Zgrid1);
 Zgrid2=linspace(-250,250,Nbin+1);
@@ -331,10 +342,18 @@ plot(Zfit,KappaFit,'b.');
 
 ylim([0,5]);
 
+%% Get the critical point
+mask=abs(ZBinZ)<95;
+ZTshow=ZBinZ(mask);
+Tshow=T_trap./EFS1BinZ(mask);
+
+Zcr1=interp1(Tshow(ZTshow>0),ZTshow(ZTshow>0),0.167);
+Zcr2=interp1(Tshow(ZTshow<0),ZTshow(ZTshow<0),0.167);
+
 %% plot n vs z
 
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.4,0.6]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.8]);
 
 hold on
 plot(ZS2BinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
@@ -343,21 +362,15 @@ plot(ZS1BinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1);
 % line([Zcr2,Zcr2],[-10,10],'linewidth',1,'color',[201,67,52]/255);
 line([Zcr1,Zcr1],[-20,20],'linewidth',0.5,'color','k')
 line([Zcr2,Zcr2],[-20,20],'linewidth',0.5,'color','k')
-
+box on
 hold off
 ylim([-0.05,0.2]);xlim([-250,250])
 set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 0.1 0.2 0.3],'Xtick',[-200,-100,0,100,200])
+xlabel('Z (um)');ylabel('n(um^{-3})')
 
-%% Get the critical point
-mask=abs(ZBinZ)<95;
-ZTshow=ZBinZ(mask);
-Tshow=T_trap./EFS1BinZ(mask);
-
-Zcr1=interp1(Tshow(ZTshow>0),ZTshow(ZTshow>0),0.167);
-Zcr2=interp1(Tshow(ZTshow<0),ZTshow(ZTshow<0),0.167);
 %%
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.2]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.5,0.6]);
 plot(ZS2BinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
 hold on
 plot(ZS1BinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1)
@@ -365,7 +378,7 @@ line([Zcr1,Zcr1],[-1000,1000],'linewidth',0.5,'color','k');
 line([Zcr2,Zcr2],[-1000,1000],'linewidth',0.5,'color','k');
 set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0,0.1,0.2],'Xtick',[-200,-100,0,100,200])
 hold off
-xlabel('z(um)');ylabel('n(um^{-3})')
+
 xlim([-250,250]);
 ylim([-0.05,0.25]);
 %% T/TF plot
@@ -381,7 +394,7 @@ xlim([-250,250]);ylim([0,0.3]);
 
 %% Kappa vs Z plot
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,2.0]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,4,3.2]);
 %plot(Zfit,KappaFit,'linewidth',1,'color','k');
 
 %errorbar1derr_Z( Zfit,KappaFit,KappaFitErr,'MarkerEdgeColor',[65,64,66]/255,'ErrLineWidth',0.5,'ErrBarColor','k','LineStyle','none','Markersize',3 )
@@ -396,10 +409,4 @@ line([-250,250],[1/0.376,1/0.376],'linewidth',0.5,'color','k')
 hold off
 ylim([-0.2,3.8]);xlim([-250,250])
 set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 1 2 3],'Xtick',[-200,-100,0,100,200],'box','on')
-xlabel('z (um)');ylabel('\kappa/\kappa_0')
-
-%%
-ROI=[233,267,437,607];
-AverageCountsA=mean(mean(imglistS1Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),2)-imglistS1Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),3)))
-AverageCountsB=mean(mean(imglistS2Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),2)-imglistS2Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),3)))
-
+ylabel('\kappa/\kappa_0');xlabel('z (um)')
