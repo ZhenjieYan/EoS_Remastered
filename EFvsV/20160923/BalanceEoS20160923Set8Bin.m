@@ -8,10 +8,10 @@ pixellength=0.7*10^-6*3; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.5189;
+Fudge=1.7087;
 kB=1.380e-23;
 Nsat=770;
-load('/Users/Zhenjie/Data/Processed/2016-09-23/2016-09-23Set1Bin.mat')
+load('/Users/Zhenjie/Data/Processed/2016-09-23/2016-09-23Set8Bin.mat')
 warning ('off','all')
 %% Get the profile for all of them
 nS1list={};
@@ -22,7 +22,7 @@ EFS1List={};
 for i=1:length(imglistS1Final)
     disp(i);
     [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,265,456,600],...
-    'ROI2',[270,400,456,490],'TailRange',[325,580],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    'ROI2',[270,400,456,460],'TailRange',[325,580],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
     'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);
     nS1list=[nS1list;nsort/1e18];%
@@ -42,7 +42,7 @@ EFS2List={};
 for i=1:length(imglistS1Final)
     disp(i);
     [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS2,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,265,456,600],...
-    'ROI2',[270,400,456,490],'TailRange',[325,580],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    'ROI2',[270,400,456,460],'TailRange',[325,580],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
     'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);
     nS2list=[nS2list;nsort/1e18];
@@ -216,7 +216,7 @@ plot(VBinV,P1T);ylim([0,4])
 %% fit the pressure with Mark's EoS to get temperature
 load('/Users/Zhenjie/Data/Processed/Mark/MarkEoS.mat')
 Vth1=500;
-Vth2=2000;
+Vth2=1400;
 mask1=VBinV>Vth1;mask2=VBinV<Vth2;
 mask=mask1 & mask2;
 VSample=VBinV(mask);
@@ -367,13 +367,14 @@ axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.8]);
 hold on
 plot(ZBinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
 plot(ZBinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1);
+plot(ZBinZ,(nS1BinZ-nS2BinZ)*5,'color',[36,85,189]/255,'linewidth',1)
 % line([Zcr1,Zcr1],[-10,10],'linewidth',1,'color',[201,67,52]/255);
 % line([Zcr2,Zcr2],[-10,10],'linewidth',1,'color',[201,67,52]/255);
 line([Zcr1,Zcr1],[-20,20],'linewidth',0.5,'color','k')
 line([Zcr2,Zcr2],[-20,20],'linewidth',0.5,'color','k')
 box on
 hold off
-ylim([-0.05,0.3]);xlim([-250,250])
+ylim([-0.05,0.2]);xlim([-250,250])
 set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 0.1 0.2 0.3],'Xtick',[-200,-100,0,100,200])
 xlabel('Z (um)');ylabel('n(um^{-3})')
 
