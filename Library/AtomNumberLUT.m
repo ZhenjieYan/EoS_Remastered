@@ -18,8 +18,8 @@ mask3=(WA>0) & (WOA>0);
 mask4=(WOA<=WA);
 
 mask=mask1&mask2&mask3&mask4;
-Nimg(mask)=-griddata(Iini,Ifin,OD,WA(mask),WOA(mask));
-
+Nimg(mask)=-griddata(Iini,Ifin,OD,WA(mask),WOA(mask))/sigma*pixelsize;
+%Nimg(mask)=-griddata(Iini,Ifin,OD,WA(mask),WOA(mask));
 
 mask1=isnan(Nimg);
 mask2=(WA>0) & (WOA>0);
@@ -28,7 +28,7 @@ mask4=((WA>0.95*WOA)&(WA<1.05*WOA)) | ((WOA<0.05)&(WA<0.05));
 mask=mask1&mask2&mask3&mask4;
 
 OD_con=log(WOA./WA);
-Nimg(mask)=OD_con(mask);
-
+Nimg(mask)=OD_con(mask)/sigma*pixelsize;
+%Nimg(mask)=OD_con(mask);
 end
 

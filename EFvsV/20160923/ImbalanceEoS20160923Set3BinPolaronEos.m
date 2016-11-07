@@ -8,10 +8,11 @@ pixellength=0.7*10^-6*3; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.7510;
+Fudge=1.5810;
 kB=1.380e-23;
 Nsat=770;
-load('/Users/Zhenjie/Data/Processed/2016-08-30/2016-08-30Set17Bin.mat')
+[ KappaTildeT, PTildeT, TTildeT, CV_NkBT , beta_mu_vecT ,Z_vecT ] = IdealFermiEOS();
+load('/Users/Zhenjie/Data/Processed/2016-09-23/2016-09-23Set3Bin.mat')
 warning ('off','all')
 %% Get the profile for all of them
 nS1list={};
@@ -21,10 +22,10 @@ ZS1sortlist={};
 EFS1List={};
 for i=1:length(imglistS1Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,360,456,705],...
-    'ROI2',[320,482,456,600],'TailRange',[450,650],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,265,456,600],...
+    'ROI2',[320,380,456,470],'TailRange',[325,580],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
-    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1,'Zaveraging',0);%'TailRange',[180,380],,'TailRange',[325,580]
+    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1,'Zaveraging',0);%'TailRange',[180,380],
     nS1list=[nS1list;nsort/1e18];%
     Z0S1=zcor.z0*pixellength/1e-6;
     Z0S1list=[Z0S1list;Z0S1];
@@ -39,8 +40,8 @@ ZS2list={};
 Z0S2list=[];
 for i=1:length(imglistS2Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,360,456,705],...
-    'ROI2',[320,524,456,567],'TailRange',[450,650],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,265,456,600],...
+    'ROI2',[270,428,456,455],'TailRange',[325,580],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',1,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
     'IfCleanImage',1,'OutlineExtrapolate',0,'OutlineIntrapolate',1,'Zaveraging',0,'IfExtrapolateAngle',1);%
     nS2list=[nS2list;nsort/1e18];
@@ -108,14 +109,19 @@ EFS2=(1/(2*mli))*hbar^2*(6*pi^2*abs(nS2)*1e18).^(2/3).*sign(nS2)/hh;
 
 Nbin=150;
 VGrid=linspace(0,1.0e4,Nbin+1);
-[VS1BinV,EFS1BinV]=BinGrid(VS1,EFS1,VGrid,0);
+[VS1BinV,EFS1BinV,VS1ErrBinV,EFS1ErrBinV]=BinGrid(VS1,EFS1,VGrid,0);
 mask=isnan(VS1BinV);
 VS1BinV(mask)=[];
 EFS1BinV(mask)=[];
-[VS2BinV,EFS2BinV1]=BinGrid(VS2,EFS2,VGrid,0);
+VS1ErrBinV(mask)=[];
+EFS1ErrBinV(mask)=[];
+
+[VS2BinV,EFS2BinV1,VS2ErrBinV1,EFS2ErrBinV1]=BinGrid(VS2,EFS2,VGrid,0);
 mask=isnan(VS2BinV);
 VS2BinV(mask)=[];
 EFS2BinV1(mask)=[];
+VS2ErrBinV1(mask)=[];
+EFS2ErrBinV1(mask)=[];
 
 Vth=4000;
 VtailS1=VS1BinV(VS1BinV>Vth);
@@ -142,7 +148,8 @@ EFS2BinV1=EFS2BinV1-mean(EFtailS2);
 
 VBinV=VS1BinV;
 %nS1BG=mean(nS1BinV(VBinV>8000));
-EFS2BinV=interp1(VS2BinV,EFS2BinV1,VBinV);
+EFS2BinV=interp1(VS2BinV,EFS2BinV1,VBinV,'cube');
+EFS2ErrBinV=interp1(VS2BinV,EFS2ErrBinV1,VBinV,'cube');
 nS1BinV=(2*mli*abs(EFS1BinV)*hh/hbar^2).^(3/2)/(6*pi^2)/1e18.*sign(EFS1BinV);
 nS2BinV=(2*mli*abs(EFS2BinV)*hh/hbar^2).^(3/2)/(6*pi^2)/1e18.*sign(EFS2BinV);
 
@@ -173,7 +180,10 @@ xlim([0,10000]);
 legend('show')
 xlabel('U(Hz)');ylabel('E_F(Hz)')
 %%
-Vth=1500;
+%errorbar(VS1BinV,EFS1BinV,EFS1ErrBinV);
+errorbar(VBinV,EFS2BinV,EFS2ErrBinV);
+%%
+Vth=1700;
 mask=VBinV>Vth;
 
 Vfit=VBinV(mask);
@@ -197,7 +207,7 @@ beta_mu_localZ=mu_localZ/T_trap;
 KappaFitZ=interp1(beta_mu_T,KappaTildeT,beta_mu_localZ,'spline');
 KappaFitZ(KappaFitZ<0)=0;
 % get the kappa from image profile
-[KappaTildeS1BinV,~]=FiniteD( VBinV,VBinV*0,EFS1BinV,EFS1BinV*0,7);
+[KappaTildeS1BinV,KappaTildeS1ErrBinV]=FiniteD( VBinV,VBinV*0,EFS1BinV,EFS1ErrBinV,9);
 KappaTildeS1BinV=-KappaTildeS1BinV;
 
 figure1 = figure;
@@ -212,12 +222,41 @@ ylabel('\kappa/\kappa_0');
 xlabel('U (Hz)');
 %%
 
-[KappaTildeS2BinV,~]=FiniteD( VBinV,VBinV*0,EFS2BinV,EFS2BinV*0,5);
+[KappaTildeS2BinV,KappaTildeS2ErrBinV]=FiniteD( VBinV,VBinV*0,EFS2BinV,EFS2ErrBinV,5);
 KappaTildeS2BinV=-KappaTildeS2BinV;
 plot(VBinV,KappaTildeS2BinV,'ro');
 xlim([0,10e3])
 ylabel('\kappa/\kappa_0');
 xlabel('U (Hz)');
+%%
+errorbar(VBinV,KappaTildeS2BinV,KappaTildeS2ErrBinV)
+xlim([0,10e3])
+ylabel('\kappa/\kappa_0');
+xlabel('U (Hz)');
+
+%% Polaron EoS
+meff=1.3
+TTildeS2=T_trap./EFS2BinV;
+mask1=TTildeS2>0;
+mask2=TTildeS2<2;
+mask=mask1 & mask2;
+TEoSS2=TTildeS2(mask);
+KappaEoSS2=KappaTildeS2BinV(mask)/1.615;
+KappaEoSErrS=KappaTildeS2ErrBinV(mask)/1.615;
+
+figure1 = figure;
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,2.7,2.1]);
+errorbar(TEoSS2,KappaEoSS2,KappaEoSErrS,'b.','markersize',10,'displayname','Data');
+hold on 
+plot(TTildeT,KappaTildeT,'k-','displayname','m*/m=1');
+plot(TTildeT*meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
+hold off
+xlim([0,2]);ylim([0.2,1.5])
+ylabel('\kappa/\kappa_0');
+xlabel('T/T_F');
+legend('show')
+
+
 %%
 n_ideal_BinV=IdealGasnV( [mu_trap_S1,T_trap],VBinV );
 
@@ -232,6 +271,8 @@ legend show
 
 ylabel('n (um^{-3})');
 xlabel('U (Hz)');
+
+
 %%
 Imbalance=max(nS2BinV)/max(nS1BinV)
 %% Create the unfolded kappa vs Z
@@ -282,7 +323,7 @@ plot(ZList,KappaList,'r.','markersize',20)
 ylim([-1,2]);
 
 %%
-Nbin=140;
+Nbin=100;
 Zgrid1=linspace(-(250^2),250^2,101+1);
 Zgrid1=sqrt(abs(Zgrid1)).*sign(Zgrid1);
 Zgrid2=linspace(-350,350,Nbin+1);
@@ -296,7 +337,7 @@ errorbar(ZBinK,KappaBinK,KappaBinErrK,'r.','markersize',20);
 ylim([-0.2,3.5]);
 %% Kappa vs Z plot
 
-Vth=1500;
+Vth=1700;
 Zth=sqrt(2*Vth*hh/(mli*omega^2))/1e-6;
 
 figure1 = figure;
@@ -333,11 +374,12 @@ xlim([-250,250]);ylim([0,0.3]);
 
 figure1 = figure;
 axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.8]);
-plot(ZBinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
+plot(ZS2BinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
 hold on
-plot(ZBinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1)
-% line([Zth,Zth],[-1000,1000],'linewidth',0.5,'color','k');
-% line([-Zth,-Zth],[-1000,1000],'linewidth',0.5,'color','k');
+plot(ZS1BinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1)
+line([Zth,Zth],[-1000,1000],'linewidth',0.5,'color','k');
+line([-Zth,-Zth],[-1000,1000],'linewidth',0.5,'color','k');
+%plot(ZS1BinZ,nS2BinZ./nS1BinZ,'g-','linewidth',1)
 set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0,0.1,0.2,0.3],'Xtick',[-200,-100,0,100,200])
 hold off
 
@@ -345,6 +387,9 @@ xlim([-250,250]);xlabel('z(um)')
 ylim([-0.05,0.4]);ylabel('n(um^{-3})')
 
 %%
-ROI=[270,360,456,705];
+
+
+%%
+ROI=[280,155,407,462];
 AverageCountsA=mean(mean(imglistS1Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),2)-imglistS1Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),3)))
 AverageCountsB=mean(mean(imglistS2Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),2)-imglistS2Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),3)))

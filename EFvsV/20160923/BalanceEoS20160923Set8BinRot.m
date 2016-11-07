@@ -11,7 +11,7 @@ addpath('../../Library');
 Fudge=1.7087;
 kB=1.380e-23;
 Nsat=770;
-load('/Users/Zhenjie/Data/Processed/2016-09-23/2016-09-23Set5Bin.mat')
+load('/Users/Zhenjie/Data/Processed/2016-09-23/2016-09-23Set8BinRot.mat')
 warning ('off','all')
 %% Get the profile for all of them
 nS1list={};
@@ -21,10 +21,10 @@ ZS1sortlist={};
 EFS1List={};
 for i=1:length(imglistS1Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,265,456,600],...
-    'ROI2',[270,389,456,469],'TailRange',[350,520],'ShowOutline',0,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[330,300,500,625],...
+    'ROI2',[330,430,500,475],'TailRange',[390,525],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
-    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);
+    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);%
     nS1list=[nS1list;nsort/1e18];%
     Z0S1=zcor.z0*pixellength/1e-6;
     Z0S1list=[Z0S1list;Z0S1];
@@ -41,8 +41,8 @@ ZS2sortlist={};
 EFS2List={};
 for i=1:length(imglistS1Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS2,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,265,456,600],...
-    'ROI2',[270,389,456,469],'TailRange',[350,520],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS2,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[330,300,500,625],...
+    'ROI2',[330,430,500,475],'TailRange',[390,525],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
     'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);
     nS2list=[nS2list;nsort/1e18];
@@ -216,7 +216,7 @@ plot(VBinV,P1T);ylim([0,4])
 %% fit the pressure with Mark's EoS to get temperature
 load('/Users/Zhenjie/Data/Processed/Mark/MarkEoS.mat')
 Vth1=500;
-Vth2=2000;
+Vth2=1400;
 mask1=VBinV>Vth1;mask2=VBinV<Vth2;
 mask=mask1 & mask2;
 VSample=VBinV(mask);
@@ -318,7 +318,7 @@ Zgrid2=linspace(-250,250,Nbin+1);
 Zgrid=sort([Zgrid1(abs(Zgrid1)<120),Zgrid2(abs(Zgrid2)>120)]);
 %Zgrid=Zgrid2;
 
-[ZBinK,KappaBinK,~,~,~,KappaBinErrK]=BinGrid(ZList,KappaList,Zgrid,2);
+[ZBinK,KappaBinK,~,~,~,KappaBinErrK]=BinGrid(ZList,KappaList,Zgrid,0);
 KappaBinErrK=KappaBinErrK/sqrt(length(ZS1sortlist));
 errorbar(ZBinK,KappaBinK,KappaBinErrK,'r.','markersize',20);
 ylim([-0.2,3.5]);
@@ -367,6 +367,7 @@ axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.8]);
 hold on
 plot(ZBinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
 plot(ZBinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1);
+%plot(ZBinZ,(nS1BinZ-nS2BinZ)*5,'color',[36,85,189]/255,'linewidth',1)
 % line([Zcr1,Zcr1],[-10,10],'linewidth',1,'color',[201,67,52]/255);
 % line([Zcr2,Zcr2],[-10,10],'linewidth',1,'color',[201,67,52]/255);
 line([Zcr1,Zcr1],[-20,20],'linewidth',0.5,'color','k')
@@ -379,33 +380,33 @@ xlabel('Z (um)');ylabel('n(um^{-3})')
 
 %%
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.5,0.6]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.63]);
 plot(ZBinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
 hold on
 plot(ZBinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1)
 line([Zcr1,Zcr1],[-1000,1000],'linewidth',0.5,'color','k');
 line([Zcr2,Zcr2],[-1000,1000],'linewidth',0.5,'color','k');
-set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0,0.1,0.2],'Xtick',[-200,-100,0,100,200])
+set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0,0.1,0.2 0.3],'Xtick',[-200,-100,0,100,200])
 hold off
 
 xlim([-250,250]);
-ylim([-0.05,0.25]);
+ylim([-0.03,0.25]);
 %% T/TF plot
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.5,0.6]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.63]);
 %plot(ZS1grid/1e-6,TTilde,'-')
 plot(ZTshow,Tshow,'-','color',[36,85,189]/255,'linewidth',1)
 line([Zcr1,Zcr1],[-20,20],'linewidth',0.5,'color','k')
 line([Zcr2,Zcr2],[-20,20],'linewidth',0.5,'color','k')
-set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 0.1 0.2],'Xtick',[-200,-100,0,100,200])
+set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 0.1 0.2 0.3 0.4],'Xtick',[-200,-100,0,100,200])
 ylabel('T/T_F');xlabel('Z');
-xlim([-250,250]);ylim([0,0.3]);
+xlim([-250,250]);ylim([0,0.4]);
 
 %% Kappa vs Z plot
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.8]);%plot(Zfit,KappaFit,'linewidth',1,'color','k');
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.84]);%plot(Zfit,KappaFit,'linewidth',1,'color','k');
 
-%errorbar1derr_Z( Zfit,KappaFit,KappaFitErr,'MarkerEdgeColor',[65,64,66]/255,'ErrLineWidth',0.5,'ErrBarColor','k','LineStyle','none','Markersize',3 )
+errorbar1derr_Z( Zfit(1:3:end),KappaFit(1:3:end),KappaFitErr(1:3:end),'MarkerEdgeColor',[65,64,66]/255,'ErrLineWidth',0.5,'ErrBarColor','k','LineStyle','none','Markersize',3 )
 %shadedErrorBar(Zfit(Zfit<0),KappaFit(Zfit<0),KappaFitErr(Zfit<0))
 hold on
 %shadedErrorBar(Zfit(Zfit>0),KappaFit(Zfit>0),KappaFitErr(Zfit>0))
@@ -414,7 +415,7 @@ errorbar1derr_Z( ZBinK,KappaBinK,KappaBinErrK,'MarkerEdgeColor',[49,115,255]/255
 line([Zcr1,Zcr1],[-20,20],'linewidth',0.5,'color','k')
 line([Zcr2,Zcr2],[-20,20],'linewidth',0.5,'color','k')
 line([-250,250],[1/0.376,1/0.376],'linewidth',0.5,'color','k');
-line([-250,250],[1/0.42,1/0.42],'linewidth',0.5,'color','k');
+%line([-250,250],[1/0.42,1/0.42],'linewidth',0.5,'color','k');
 hold off
 ylim([-0.2,3.8]);xlim([-250,250])
 set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 1 2 3],'Xtick',[-200,-100,0,100,200],'box','on')

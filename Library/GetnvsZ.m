@@ -3,7 +3,7 @@ function [ n,Z ] = GetnvsZ( img,X1,X2,Y,pixelsize,ellipticity,varargin )
 %range we care about in hybrid trap;
 Nmethod=0;
 Xl=6;
-
+BoxShape='Circular';
 for i =1:length(varargin)
     if ischar(varargin{i})
     switch varargin{i}
@@ -11,6 +11,8 @@ for i =1:length(varargin)
             Nmethod=varargin{i+1};
         case 'Zaveraging'
             Zaveraging=varargin{i+1};
+        case 'BoxShape'
+            BoxShape=varargin{i+1};
     end
     end
 end
@@ -28,7 +30,12 @@ for i=1:N
     %Nx=(img(Z(i),round(x1):round(x2))+img(Z(i)+1,round(x1):round(x2))+img(Z(i)-1,round(x1):round(x2)))/3;
     Nxavg=sum(img((Z(i)-Zaveraging):(Z(i)+Zaveraging),round(x1):round(x2)),2);
     N=mean(sum(Nxavg,2));
-    Volume=pi/4*D^2*ellipticity*pixelsize^3;
+    switch BoxShape
+        case 'Circular'
+            Volume=pi/4*D^2*ellipticity*pixelsize^3;
+        case 'Square'
+            Volume=D^2*ellipticity*pixelsize^3;
+    end
     n(i)=N/Volume;
 end
 end

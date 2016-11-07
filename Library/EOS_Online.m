@@ -1,4 +1,4 @@
-function [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFsort,P,zcor,Vsel] = EOS_Online( Input,varargin )
+function [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFsort,P,zcor,Vsel,output] = EOS_Online( Input,varargin )
 %The hope is to use this function as an easy way to do online fitting for
 %EoS data
 %FileName: the name of the file
@@ -47,6 +47,7 @@ omega=23.9*2*pi; %in rad/s
 OutlineIntrapolate=1;
 IfExtrapolateAngle=0;
 IfReadImg=0;
+BoxShape='Circular';
 for i =1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
@@ -135,6 +136,8 @@ for i =1:length(varargin)
                 OutlineIntrapolate=varargin{i+1};
             case 'IfExtrapolateAngle'
                 IfExtrapolateAngle=varargin{i+1};
+            case 'BoxShape'
+                BoxShape=varargin{i+1};
         end
     end
 end
@@ -229,7 +232,7 @@ if IfSuperSampling
 end
 
 %Get the position of the tail, and tailor the tail to be a flat line
-[n,z]=GenNvsZ( Nimg,ROI1,ROI2,pixellength,0,1 ,'ShowOutline',ShowOutline,'Nmethod',Nmethod,'OutlineExtrapolate',OutlineExtrapolate,'OutlineIntrapolate',OutlineIntrapolate,'Zaveraging',Zaveraging,'IfExtrapolateAngle',IfExtrapolateAngle);
+[n,z]=GenNvsZ( Nimg,ROI1,ROI2,pixellength,0,1 ,'ShowOutline',ShowOutline,'Nmethod',Nmethod,'OutlineExtrapolate',OutlineExtrapolate,'OutlineIntrapolate',OutlineIntrapolate,'Zaveraging',Zaveraging,'IfExtrapolateAngle',IfExtrapolateAngle,'BoxShape',BoxShape);
 
 
 if CropTail
@@ -264,6 +267,7 @@ end
 
 V=0.5*mli*omega^2*Z.^2;
 Vtf=0.5*mli*omega^2*Ztf.^2;
+output.Vtf=Vtf;
 
 %excute the cutt off
 Zcut=Ztf*CutOff;

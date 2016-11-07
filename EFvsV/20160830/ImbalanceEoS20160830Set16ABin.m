@@ -8,10 +8,10 @@ pixellength=0.7*10^-6*3; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.7510;
+Fudge=1.5202;
 kB=1.380e-23;
 Nsat=770;
-load('/Users/Zhenjie/Data/Processed/2016-08-30/2016-08-30Set17Bin.mat')
+load('/Users/Zhenjie/Data/Processed/2016-08-30/2016-08-30Set16ABin.mat')
 warning ('off','all')
 %% Get the profile for all of them
 nS1list={};
@@ -173,7 +173,7 @@ xlim([0,10000]);
 legend('show')
 xlabel('U(Hz)');ylabel('E_F(Hz)')
 %%
-Vth=1500;
+Vth=1700;
 mask=VBinV>Vth;
 
 Vfit=VBinV(mask);
@@ -296,7 +296,7 @@ errorbar(ZBinK,KappaBinK,KappaBinErrK,'r.','markersize',20);
 ylim([-0.2,3.5]);
 %% Kappa vs Z plot
 
-Vth=1500;
+Vth=1700;
 Zth=sqrt(2*Vth*hh/(mli*omega^2))/1e-6;
 
 figure1 = figure;

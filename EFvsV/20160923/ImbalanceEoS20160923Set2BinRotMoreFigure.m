@@ -8,10 +8,10 @@ pixellength=0.7*10^-6*3; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.7510;
+Fudge=1.7087;
 kB=1.380e-23;
 Nsat=770;
-load('/Users/Zhenjie/Data/Processed/2016-08-30/2016-08-30Set17Bin.mat')
+load('/Users/Zhenjie/Data/Processed/2016-09-23/2016-09-23Set2BinRotMore.mat')
 warning ('off','all')
 %% Get the profile for all of them
 nS1list={};
@@ -21,10 +21,10 @@ ZS1sortlist={};
 EFS1List={};
 for i=1:length(imglistS1Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,360,456,705],...
-    'ROI2',[320,482,456,600],'TailRange',[450,650],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[350,250,478,620],...
+    'ROI2',[350,406,478,509],'TailRange',[350,570],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
-    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1,'Zaveraging',0);%'TailRange',[180,380],,'TailRange',[325,580]
+    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1,'Zaveraging',0);%'TailRange',[350,370],
     nS1list=[nS1list;nsort/1e18];%
     Z0S1=zcor.z0*pixellength/1e-6;
     Z0S1list=[Z0S1list;Z0S1];
@@ -39,10 +39,10 @@ ZS2list={};
 Z0S2list=[];
 for i=1:length(imglistS2Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,360,456,705],...
-    'ROI2',[320,524,456,567],'TailRange',[450,650],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[350,250,478,620],...
+    'ROI2',[350,440,478,472],'TailRange',[350,570],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',1,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
-    'IfCleanImage',1,'OutlineExtrapolate',0,'OutlineIntrapolate',1,'Zaveraging',0,'IfExtrapolateAngle',1);%
+    'IfCleanImage',1,'OutlineExtrapolate',1,'OutlineIntrapolate',1,'Zaveraging',0,'IfExtrapolateAngle',1);%
     nS2list=[nS2list;nsort/1e18];
     Z0S2=zcor.z0*pixellength/1e-6;
     Z0S2list=[Z0S2list;Z0S2];
@@ -69,7 +69,7 @@ UnbinnedProfile.ZS1=ZS1;
 UnbinnedProfile.ZS2=ZS2;
 plot(ZS1,nS1,'b.',ZS2,nS2,'r.')
 %% Bin the profile with Z
-Nbin=250;
+Nbin=150;
 ZGrid=linspace(-400,400,Nbin+1);
 [ZS1BinZ,nS1Bin]=BinGrid(ZS1,nS1,ZGrid,0);
 [ZS2BinZ,nS2Bin]=BinGrid(ZS2,nS2,ZGrid,0);
@@ -173,7 +173,7 @@ xlim([0,10000]);
 legend('show')
 xlabel('U(Hz)');ylabel('E_F(Hz)')
 %%
-Vth=1500;
+Vth=1700;
 mask=VBinV>Vth;
 
 Vfit=VBinV(mask);
@@ -212,7 +212,7 @@ ylabel('\kappa/\kappa_0');
 xlabel('U (Hz)');
 %%
 
-[KappaTildeS2BinV,~]=FiniteD( VBinV,VBinV*0,EFS2BinV,EFS2BinV*0,5);
+[KappaTildeS2BinV,~]=FiniteD( VBinV,VBinV*0,EFS2BinV,EFS2BinV*0,7);
 KappaTildeS2BinV=-KappaTildeS2BinV;
 plot(VBinV,KappaTildeS2BinV,'ro');
 xlim([0,10e3])
@@ -234,6 +234,9 @@ ylabel('n (um^{-3})');
 xlabel('U (Hz)');
 %%
 Imbalance=max(nS2BinV)/max(nS1BinV)
+%%
+P=TFfit( nS2BinZ,ZBinZ,100);
+ZTF=P(3);
 %% Create the unfolded kappa vs Z
 
 ZList=[];
@@ -248,7 +251,7 @@ for i=1:Iteration*length(ZS1sortlist)
         j=length(ZS1sortlist);
     end
     k=round((i-j)/length(ZS1sortlist))+1;
-    Nbin=600;
+    Nbin=1250;
     Z_vec=ZS1sortlist{j};
     Tgrid0=linspace(sign(min(Z_vec))*min(Z_vec).^2,sign(max(Z_vec))*max(Z_vec).^2,Nbin+1);
     DeltaT=abs(Tgrid0(2)-Tgrid0(1));
@@ -282,7 +285,7 @@ plot(ZList,KappaList,'r.','markersize',20)
 ylim([-1,2]);
 
 %%
-Nbin=140;
+Nbin=70;
 Zgrid1=linspace(-(250^2),250^2,101+1);
 Zgrid1=sqrt(abs(Zgrid1)).*sign(Zgrid1);
 Zgrid2=linspace(-350,350,Nbin+1);
@@ -296,18 +299,18 @@ errorbar(ZBinK,KappaBinK,KappaBinErrK,'r.','markersize',20);
 ylim([-0.2,3.5]);
 %% Kappa vs Z plot
 
-Vth=1500;
+Vth=1700;
 Zth=sqrt(2*Vth*hh/(mli*omega^2))/1e-6;
 
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,4,3.2]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.84]);
 plot( ZS1BinZ,KappaFitZ,'Color','k')
 hold on
 %plot(ZBin,KappaBin,'.','markersize',20,'color',[49,115,255]/255,'linewidth',1)
 errorbar1derr_Z( ZBinK,KappaBinK,KappaBinErrK,'MarkerEdgeColor',[49,115,255]/255,'ErrLineWidth',0.5,'ErrBarColor',[36,85,189]/255,'LineStyle','none','Markersize',5)
 
-line([Zth,Zth],[-20,20],'linewidth',0.5,'color','k')
-line([-Zth,-Zth],[-20,20],'linewidth',0.5,'color','k')
+line([ZTF,ZTF],[-20,20],'linewidth',0.5,'color','k')
+line([-ZTF,-ZTF],[-20,20],'linewidth',0.5,'color','k')
 
 hold off
 ylim([-0.2,3.8]);xlim([-250,250]);
@@ -316,35 +319,66 @@ set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'box','on','Xtick',
 
 %%
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.5,0.6]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.63]);
 mask=abs(ZBinZ)<170;
 %plot(ZS1grid/1e-6,TTilde,'-')
 plot(ZBinZ(mask),T_trap./EFS1BinZ(mask),'-','color',[36,85,189]/255,'linewidth',1)
 hold on
-line([Zth,Zth],[-100,100],'color','k','linewidth',0.5)
-line([-Zth,-Zth],[-100,100],'color','k','linewidth',0.5)
+% line([Zth,Zth],[-100,100],'color','k','linewidth',0.5)
+% line([-Zth,-Zth],[-100,100],'color','k','linewidth',0.5)
+
+line([ZTF,ZTF],[-100,100],'color','k','linewidth',0.5)
+line([-ZTF,-ZTF],[-100,100],'color','k','linewidth',0.5)
 
 hold off
-set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 0.1 0.2 0.4 0.6],'Xtick',[-200,-100,0,100,200])
+set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 0.1 0.2 0.3 0.4 ],'Xtick',[-200,-100,0,100,200])
 ylabel('T/T_F');xlabel('Z');
-xlim([-250,250]);ylim([0,0.3]);
+xlim([-250,250]);ylim([0,0.4]);
 
 %%
 
+
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.8]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.63]);
 plot(ZBinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
 hold on
 plot(ZBinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1)
-% line([Zth,Zth],[-1000,1000],'linewidth',0.5,'color','k');
-% line([-Zth,-Zth],[-1000,1000],'linewidth',0.5,'color','k');
+% line([Zth,Zth],[-2000,5000],'linewidth',0.5,'color','k');
+% line([-Zth,-Zth],[-2000,5000],'linewidth',0.5,'color','k');
+
+
+line([ZTF,ZTF],[-100,100],'color','k','linewidth',0.5)
+line([-ZTF,-ZTF],[-100,100],'color','k','linewidth',0.5)
+
+
 set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0,0.1,0.2,0.3],'Xtick',[-200,-100,0,100,200])
 hold off
 
 xlim([-250,250]);xlabel('z(um)')
-ylim([-0.05,0.4]);ylabel('n(um^{-3})')
+ylim([-0.03,0.25]);ylabel('n(um^{-3})')
 
 %%
-ROI=[270,360,456,705];
+
+figure1 = figure;
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.63]);
+plot(ZS1BinEF,EFS1BinEF/1e3,'color',[201,67,52]/255,'linewidth',1);
+hold on
+plot(ZS2BinEF,EFS2BinEF/1e3,'color',[36,85,189]/255,'linewidth',1)
+% line([Zth,Zth],[-2000,5000],'linewidth',0.5,'color','k');
+% line([-Zth,-Zth],[-2000,5000],'linewidth',0.5,'color','k');
+
+
+line([ZTF,ZTF],[-100,100],'color','k','linewidth',0.5)
+line([-ZTF,-ZTF],[-100,100],'color','k','linewidth',0.5)
+
+set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0,2.5 5],'Xtick',[-200,-100,0,100,200])
+hold off
+
+xlim([-250,250]);xlabel('z(um)')
+ylim([-0.5,6.5]);ylabel('n(um^{-3})')
+
+
+%%
+ROI=[280,155,407,462];
 AverageCountsA=mean(mean(imglistS1Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),2)-imglistS1Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),3)))
 AverageCountsB=mean(mean(imglistS2Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),2)-imglistS2Final{1}(ROI(2):ROI(4),ROI(1):ROI(3),3)))

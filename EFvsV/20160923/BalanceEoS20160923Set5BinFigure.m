@@ -22,7 +22,7 @@ EFS1List={};
 for i=1:length(imglistS1Final)
     disp(i);
     [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,265,456,600],...
-    'ROI2',[270,389,456,469],'TailRange',[350,520],'ShowOutline',0,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    'ROI2',[270,389,456,469],'TailRange',[350,520],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
     'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);
     nS1list=[nS1list;nsort/1e18];%
@@ -44,7 +44,7 @@ for i=1:length(imglistS1Final)
     [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS2,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,265,456,600],...
     'ROI2',[270,389,456,469],'TailRange',[350,520],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
-    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);
+    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);%,'TailRange',[325,580]
     nS2list=[nS2list;nsort/1e18];
     Z0S2=zcor.z0*pixellength/1e-6;
     Z0S2list=[Z0S2list;Z0S2];
@@ -56,15 +56,19 @@ end
 %%
 nS1=[];
 ZS1=[];
+EFS1=[];
 for i=1:length(nS1list)
     nS1=[nS1;nS1list{i}];
     ZS1=[ZS1;ZS1list{i}-mean(Z0S1list)];
+    EFS1=[EFS1;EFS1List{i}/hh];
 end
 nS2=[];
 ZS2=[];
+EFS2=[];
 for i=1:length(nS2list)
     nS2=[nS2;nS2list{i}];
     ZS2=[ZS2;ZS2list{i}-mean(Z0S2list)];
+    EFS2=[EFS2;EFS2List{i}/hh];
 end
 
 UnbinnedProfile.nS1=nS1;
@@ -215,7 +219,7 @@ P1T=P./P0;
 plot(VBinV,P1T);ylim([0,4])
 %% fit the pressure with Mark's EoS to get temperature
 load('/Users/Zhenjie/Data/Processed/Mark/MarkEoS.mat')
-Vth1=500;
+Vth1=700;
 Vth2=2000;
 mask1=VBinV>Vth1;mask2=VBinV<Vth2;
 mask=mask1 & mask2;
@@ -352,7 +356,7 @@ plot(Zfit,KappaFit,'b.');
 ylim([0,5]);
 
 %% Get the critical point
-mask=abs(ZBinZ)<95;
+mask=abs(ZBinZ)<105;
 ZTshow=ZBinZ(mask);
 Tshow=T_trap./EFS1BinZ(mask);
 
@@ -362,7 +366,7 @@ Zcr2=interp1(Tshow(ZTshow<0),ZTshow(ZTshow<0),0.167);
 %% plot n vs z
 
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.8]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.63]);
 
 hold on
 plot(ZBinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
@@ -373,13 +377,13 @@ line([Zcr1,Zcr1],[-20,20],'linewidth',0.5,'color','k')
 line([Zcr2,Zcr2],[-20,20],'linewidth',0.5,'color','k')
 box on
 hold off
-ylim([-0.05,0.4]);xlim([-250,250])
+ylim([-0.05,0.35]);xlim([-250,250])
 set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 0.1 0.2 0.3],'Xtick',[-200,-100,0,100,200])
 xlabel('Z (um)');ylabel('n(um^{-3})')
 
 %%
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.5,0.6]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.63]);
 plot(ZBinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
 hold on
 plot(ZBinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1)
@@ -389,23 +393,23 @@ set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0,0.1,0.2]
 hold off
 
 xlim([-250,250]);
-ylim([-0.05,0.25]);
+ylim([-0.03,0.25]);
 %% T/TF plot
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.5,0.6]);
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.63]);
 %plot(ZS1grid/1e-6,TTilde,'-')
 plot(ZTshow,Tshow,'-','color',[36,85,189]/255,'linewidth',1)
 line([Zcr1,Zcr1],[-20,20],'linewidth',0.5,'color','k')
 line([Zcr2,Zcr2],[-20,20],'linewidth',0.5,'color','k')
-set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 0.1 0.2],'Xtick',[-200,-100,0,100,200])
+set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 0.1 0.2 0.3],'Xtick',[-200,-100,0,100,200])
 ylabel('T/T_F');xlabel('Z');
-xlim([-250,250]);ylim([0,0.3]);
+xlim([-250,250]);ylim([0,0.4]);
 
 %% Kappa vs Z plot
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.8]);%plot(Zfit,KappaFit,'linewidth',1,'color','k');
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.84]);%plot(Zfit,KappaFit,'linewidth',1,'color','k');
 
-%errorbar1derr_Z( Zfit,KappaFit,KappaFitErr,'MarkerEdgeColor',[65,64,66]/255,'ErrLineWidth',0.5,'ErrBarColor','k','LineStyle','none','Markersize',3 )
+errorbar1derr_Z( Zfit(1:3:end),KappaFit(1:3:end),KappaFitErr(1:3:end),'MarkerEdgeColor',[65,64,66]/255,'ErrLineWidth',0.5,'ErrBarColor','k','LineStyle','none','Markersize',3 )
 %shadedErrorBar(Zfit(Zfit<0),KappaFit(Zfit<0),KappaFitErr(Zfit<0))
 hold on
 %shadedErrorBar(Zfit(Zfit>0),KappaFit(Zfit>0),KappaFitErr(Zfit>0))
@@ -414,11 +418,32 @@ errorbar1derr_Z( ZBinK,KappaBinK,KappaBinErrK,'MarkerEdgeColor',[49,115,255]/255
 line([Zcr1,Zcr1],[-20,20],'linewidth',0.5,'color','k')
 line([Zcr2,Zcr2],[-20,20],'linewidth',0.5,'color','k')
 line([-250,250],[1/0.376,1/0.376],'linewidth',0.5,'color','k');
-line([-250,250],[1/0.42,1/0.42],'linewidth',0.5,'color','k');
+%line([-250,250],[1/0.42,1/0.42],'linewidth',0.5,'color','k');
 hold off
 ylim([-0.2,3.8]);xlim([-250,250])
 set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0 1 2 3],'Xtick',[-200,-100,0,100,200],'box','on')
 ylabel('\kappa/\kappa_0');xlabel('z (um)')
+%% Bin the profile with Z for EF
+Nbin=250;
+ZGrid=linspace(-400,400,Nbin+1);
+[ZS1BinEF,EFS1BinEF]=BinGrid(ZS1,EFS1,ZGrid,0);
+[ZS2BinEF,EFS2BinEF]=BinGrid(ZS2,EFS2,ZGrid,0);
+plot(ZS1BinEF,EFS1BinEF,'b.',ZS2BinEF,EFS2BinEF,'r.')
+%%
+
+figure1 = figure;
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,1.47,0.63]);
+plot(ZS2BinEF,EFS2BinEF/1e3,'color',[201,67,52]/255,'linewidth',1)
+hold on
+plot(ZS1BinEF,EFS1BinEF/1e3,'color',[36,85,189]/255,'linewidth',1);
+line([Zcr1,Zcr1],[-20,20],'linewidth',0.5,'color','k')
+line([Zcr2,Zcr2],[-20,20],'linewidth',0.5,'color','k')
+set(axes1,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Ytick',[0,2.5 5],'Xtick',[-200,-100,0,100,200])
+hold off
+
+xlim([-250,250]);xlabel('z(um)')
+ylim([-0.5,6.5]);ylabel('n(um^{-3})')
+
 
 %%
 ROI=[280,155,407,462];

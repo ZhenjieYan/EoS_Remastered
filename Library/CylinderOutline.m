@@ -6,6 +6,7 @@ function [x1,x2,X1,X2,Yt,p1,p2 ] = CylinderOutline( img,ROI,varargin )
 Extrapolate=1;
 Intrapolate=1;
 IfExtrapolateAngle=0;
+BoxShape='Circular';
 
 for i =1:length(varargin)
     if ischar(varargin{i})
@@ -16,6 +17,8 @@ for i =1:length(varargin)
             Intrapolate=varargin{i+1}; 
         case 'IfExtrapolateAngle'
             IfExtrapolateAngle=varargin{i+1};
+        case 'BoxShape'
+            BoxShape=varargin{i+1};
     end
     end
 end
@@ -32,8 +35,14 @@ X1=zeros(1,N);X2=zeros(1,N); %X cordinator of the edge for each Y value
 
 for i=1:N
     Nx=img(Y(i),X)+img(Y(i)+1,X)+img(Y(i)-1,X);
-    P=OutlineFit(Nx,X,CMass1d(Nx,X),50);
-    X1(i)=P(1)-abs(P(2));X2(i)=P(1)+abs(P(2));
+    if strcmp(BoxShape,'Cicular')
+        P=OutlineFit(Nx,X,CMass1d(Nx,X),50);
+        X1(i)=P(1)-abs(P(2));X2(i)=P(1)+abs(P(2));
+    end
+    if strcmp(BoxShape,'Square')
+        P=OutlineFitSquare(Nx,X,CMass1d(Nx,X),50);
+        X1(i)=P(1)-abs(P(2));X2(i)=P(1)+abs(P(2));
+    end
     %plot(X1(i),Y(i),'r.','MarkerSize',20);
     %plot(X2(i),Y(i),'r.','MarkerSize',20);
 end

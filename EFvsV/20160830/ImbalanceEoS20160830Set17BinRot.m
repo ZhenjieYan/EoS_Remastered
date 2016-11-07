@@ -8,10 +8,10 @@ pixellength=0.7*10^-6*3; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.7510;
+Fudge=1.7441;
 kB=1.380e-23;
 Nsat=770;
-load('/Users/Zhenjie/Data/Processed/2016-08-30/2016-08-30Set17Bin.mat')
+load('/Users/Zhenjie/Data/Processed/2016-08-30/2016-08-30Set17BinRot.mat')
 warning ('off','all')
 %% Get the profile for all of them
 nS1list={};
@@ -21,8 +21,8 @@ ZS1sortlist={};
 EFS1List={};
 for i=1:length(imglistS1Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,360,456,705],...
-    'ROI2',[320,482,456,600],'TailRange',[450,650],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,400,500,750],...
+    'ROI2',[270,515,500,615],'TailRange',[475,675],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
     'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1,'Zaveraging',0);%'TailRange',[180,380],,'TailRange',[325,580]
     nS1list=[nS1list;nsort/1e18];%
@@ -39,8 +39,8 @@ ZS2list={};
 Z0S2list=[];
 for i=1:length(imglistS2Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,360,456,705],...
-    'ROI2',[320,524,456,567],'TailRange',[450,650],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,400,500,750],...
+    'ROI2',[270,540,500,590],'TailRange',[475,675],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',1,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
     'IfCleanImage',1,'OutlineExtrapolate',0,'OutlineIntrapolate',1,'Zaveraging',0,'IfExtrapolateAngle',1);%
     nS2list=[nS2list;nsort/1e18];
@@ -173,7 +173,7 @@ xlim([0,10000]);
 legend('show')
 xlabel('U(Hz)');ylabel('E_F(Hz)')
 %%
-Vth=1500;
+Vth=1200;
 mask=VBinV>Vth;
 
 Vfit=VBinV(mask);
@@ -248,7 +248,7 @@ for i=1:Iteration*length(ZS1sortlist)
         j=length(ZS1sortlist);
     end
     k=round((i-j)/length(ZS1sortlist))+1;
-    Nbin=600;
+    Nbin=400;
     Z_vec=ZS1sortlist{j};
     Tgrid0=linspace(sign(min(Z_vec))*min(Z_vec).^2,sign(max(Z_vec))*max(Z_vec).^2,Nbin+1);
     DeltaT=abs(Tgrid0(2)-Tgrid0(1));
@@ -296,7 +296,7 @@ errorbar(ZBinK,KappaBinK,KappaBinErrK,'r.','markersize',20);
 ylim([-0.2,3.5]);
 %% Kappa vs Z plot
 
-Vth=1500;
+Vth=1200;
 Zth=sqrt(2*Vth*hh/(mli*omega^2))/1e-6;
 
 figure1 = figure;

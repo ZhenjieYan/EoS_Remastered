@@ -11,7 +11,7 @@ addpath('../../Library');
 Fudge=1.7087;
 kB=1.380e-23;
 Nsat=770;
-load('/Users/Zhenjie/Data/Processed/2016-09-23/2016-09-23Set5Bin.mat')
+load('/Users/Zhenjie/Data/Processed/2016-09-23/2016-09-23Set5BinRot.mat')
 warning ('off','all')
 %% Get the profile for all of them
 nS1list={};
@@ -21,10 +21,10 @@ ZS1sortlist={};
 EFS1List={};
 for i=1:length(imglistS1Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,265,456,600],...
-    'ROI2',[270,389,456,469],'TailRange',[350,520],'ShowOutline',0,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[340,256,475,620],...
+    'ROI2',[340,425,475,495],'TailRange',[375,550],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
-    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);
+    'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);%%,'TailRange',[325,580]
     nS1list=[nS1list;nsort/1e18];%
     Z0S1=zcor.z0*pixellength/1e-6;
     Z0S1list=[Z0S1list;Z0S1];
@@ -41,8 +41,8 @@ ZS2sortlist={};
 EFS2List={};
 for i=1:length(imglistS1Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS2,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,265,456,600],...
-    'ROI2',[270,389,456,469],'TailRange',[350,520],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS2,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[340,256,475,620],...
+    'ROI2',[340,425,475,495],'TailRange',[375,550],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
     'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1);
     nS2list=[nS2list;nsort/1e18];
@@ -216,7 +216,7 @@ plot(VBinV,P1T);ylim([0,4])
 %% fit the pressure with Mark's EoS to get temperature
 load('/Users/Zhenjie/Data/Processed/Mark/MarkEoS.mat')
 Vth1=500;
-Vth2=2000;
+Vth2=1900;
 mask1=VBinV>Vth1;mask2=VBinV<Vth2;
 mask=mask1 & mask2;
 VSample=VBinV(mask);

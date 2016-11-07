@@ -15,6 +15,7 @@ Nmethod=0;
 OutlineExtrapolate=1;
 OutlineIntrapolate=1;
 IfExtrapolateAngle=0;
+BoxShape='Circular';
 
 for i =1:length(varargin)
     if ischar(varargin{i})
@@ -31,12 +32,14 @@ for i =1:length(varargin)
             Zaveraging=varargin{i+1};
         case 'IfExtrapolateAngle'
             IfExtrapolateAngle=varargin{i+1};
+        case 'BoxShape'
+            BoxShape=varargin{i+1};
     end
     end
 end
 
 
-[x1,x2,~,~,Yt,p1,p2 ]=CylinderOutline( Img,ROI2,'Extrapolate',OutlineExtrapolate,'Intrapolate',OutlineIntrapolate,'IfExtrapolateAngle',IfExtrapolateAngle);
+[x1,x2,~,~,Yt,p1,p2 ]=CylinderOutline( Img,ROI2,'Extrapolate',OutlineExtrapolate,'Intrapolate',OutlineIntrapolate,'IfExtrapolateAngle',IfExtrapolateAngle,'BoxShape',BoxShape);
 %x1=round(x1);x2=round(x2);
 
 % check if ShowOutline is asked
