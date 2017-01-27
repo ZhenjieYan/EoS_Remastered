@@ -8,7 +8,8 @@ pixellength=0.7*10^-6*3; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.7087;
+%Fudge=1.7087;
+Fudge=1.7698;
 kB=1.380e-23;
 Nsat=770;
 load('/Users/Zhenjie/Data/Processed/2016-09-23/2016-09-23Set2Bin.mat')
@@ -122,17 +123,6 @@ EFS2BinV1(mask)=[];
 VS2ErrBinV1(mask)=[];
 EFS2ErrBinV1(mask)=[];
 
-Vth=4000;
-VtailS1=VS1BinV(VS1BinV>Vth);
-EFtailS1=EFS1BinV(VS1BinV>Vth);
-
-Vtail2=VS2BinV(VS2BinV>Vth);
-EFtailS2=EFS2BinV1(VS2BinV>Vth);
-
-EFS1BinV=EFS1BinV-mean(EFtailS1);
-EFS2BinV1=EFS2BinV1-mean(EFtailS2);
-
-
 
 Vth=7000;
 VtailS1=VS1BinV(VS1BinV>Vth);
@@ -221,7 +211,7 @@ ylabel('\kappa/\kappa_0');
 xlabel('U (Hz)');
 %%
 
-[KappaTildeS2BinV,KappaTildeS2ErrBinV]=FiniteD( VBinV,VBinV*0,EFS2BinV,EFS2ErrBinV,5);
+[KappaTildeS2BinV,KappaTildeS2ErrBinV]=FiniteD( VBinV,VBinV*0,EFS2BinV,EFS2ErrBinV,3);
 KappaTildeS2BinV=-KappaTildeS2BinV;
 plot(VBinV,KappaTildeS2BinV,'ro');
 xlim([0,10e3])
@@ -234,7 +224,7 @@ ylabel('\kappa/\kappa_0');
 xlabel('U (Hz)');
 
 %% Polaron EoS
-meff=1.2
+meff=1.25
 TTildeS2=T_trap./EFS2BinV;
 mask1=TTildeS2>0;
 mask2=TTildeS2<2;
@@ -248,9 +238,9 @@ axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,2.7,2.1]);
 errorbar(TEoSS2,KappaEoSS2,KappaEoSErrS,'b.','markersize',10,'displayname','Data');
 hold on 
 plot(TTildeT,KappaTildeT,'k-','displayname','m*/m=1');
-plot(TTildeT*meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
+plot(TTildeT/meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
 hold off
-xlim([0,2]);ylim([0.2,1.5])
+xlim([0,2]);%ylim([0.2,1.5])
 ylabel('\kappa/\kappa_0');
 xlabel('T/T_F');
 legend('show')
@@ -260,6 +250,7 @@ n_ideal_BinV=IdealGasnV( [mu_trap_S1,T_trap],VBinV );
 
 plot(VBinV,n_ideal_BinV,'k-','linewidth',1,'DisplayName','ideal');
 hold on
+%plot(VBinZ,nS1BinZ,'bo','DisplayName','Majority');
 plot(VBinV,nS1BinV,'b.','DisplayName','Majority');
 plot(VBinV,nS2BinV,'r.','DisplayName','Minority');
 plot(VBinV,n_ideal_BinV+0.6150*nS2BinV,'g-','linewidth',1,'DisplayName','ENS EoS, A=-0.615');
@@ -373,9 +364,9 @@ xlim([-250,250]);ylim([0,0.3]);
 
 figure1 = figure;
 axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.8]);
-plot(ZS2BinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
+plot(ZBinZ,nS2BinZ,'color',[201,67,52]/255,'linewidth',1);
 hold on
-plot(ZS1BinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1)
+plot(ZBinZ,nS1BinZ,'color',[36,85,189]/255,'linewidth',1)
 line([Zth,Zth],[-1000,1000],'linewidth',0.5,'color','k');
 line([-Zth,-Zth],[-1000,1000],'linewidth',0.5,'color','k');
 %plot(ZS1BinZ,nS2BinZ./nS1BinZ,'g-','linewidth',1)

@@ -8,7 +8,7 @@ pixellength=0.7*10^-6*3; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.5189;
+Fudge=1.6497;
 kB=1.380e-23;
 Nsat=770;
 load('/Users/Zhenjie/Data/Processed/2016-09-16/2016-09-16Set4Bin.mat')
@@ -182,7 +182,7 @@ xlabel('U(Hz)');ylabel('E_F(Hz)')
 %errorbar(VS1BinV,EFS1BinV,EFS1ErrBinV);
 errorbar(VBinV,EFS2BinV,EFS2ErrBinV);
 %%
-Vth=1300;
+Vth=1400;
 mask=VBinV>Vth;
 
 Vfit=VBinV(mask);
@@ -248,7 +248,7 @@ axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,2.7,2.1]);
 errorbar(TEoSS2,KappaEoSS2,KappaEoSErrS,'b.','markersize',10,'displayname','Data');
 hold on 
 plot(TTildeT,KappaTildeT,'k-','displayname','m*/m=1');
-plot(TTildeT*meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
+plot(TTildeT/meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
 hold off
 xlim([0,2]);ylim([0.2,1.5])
 ylabel('\kappa/\kappa_0');

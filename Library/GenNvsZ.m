@@ -1,4 +1,4 @@
-function [n,z] = GenNvsZ( Img,ROI1,ROI2,pixelsize,z0,ellipticity,varargin)
+function [n,z,outline] = GenNvsZ( Img,ROI1,ROI2,pixelsize,z0,ellipticity,varargin)
 %GENNVSZ Summary of this function goes here
 %This function returns a normalized density n as a function of z, z=0 is
 %the center of the axial trapping potential, which should be provided by
@@ -41,6 +41,10 @@ end
 
 [x1,x2,~,~,Yt,p1,p2 ]=CylinderOutline( Img,ROI2,'Extrapolate',OutlineExtrapolate,'Intrapolate',OutlineIntrapolate,'IfExtrapolateAngle',IfExtrapolateAngle,'BoxShape',BoxShape);
 %x1=round(x1);x2=round(x2);
+
+outline.x1=x1;
+outline.x2=x2;
+outline.Y=Yt;
 
 % check if ShowOutline is asked
 % get the ROI part for colorscale

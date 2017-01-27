@@ -232,8 +232,9 @@ if IfSuperSampling
 end
 
 %Get the position of the tail, and tailor the tail to be a flat line
-[n,z]=GenNvsZ( Nimg,ROI1,ROI2,pixellength,0,1 ,'ShowOutline',ShowOutline,'Nmethod',Nmethod,'OutlineExtrapolate',OutlineExtrapolate,'OutlineIntrapolate',OutlineIntrapolate,'Zaveraging',Zaveraging,'IfExtrapolateAngle',IfExtrapolateAngle,'BoxShape',BoxShape);
+[n,z,outline]=GenNvsZ( Nimg,ROI1,ROI2,pixellength,0,1 ,'ShowOutline',ShowOutline,'Nmethod',Nmethod,'OutlineExtrapolate',OutlineExtrapolate,'OutlineIntrapolate',OutlineIntrapolate,'Zaveraging',Zaveraging,'IfExtrapolateAngle',IfExtrapolateAngle,'BoxShape',BoxShape);
 
+output.outline=outline;
 
 if CropTail
     h=figure();

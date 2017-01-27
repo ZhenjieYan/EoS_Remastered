@@ -35,7 +35,7 @@ X1=zeros(1,N);X2=zeros(1,N); %X cordinator of the edge for each Y value
 
 for i=1:N
     Nx=img(Y(i),X)+img(Y(i)+1,X)+img(Y(i)-1,X);
-    if strcmp(BoxShape,'Cicular')
+    if strcmp(BoxShape,'Circular')
         P=OutlineFit(Nx,X,CMass1d(Nx,X),50);
         X1(i)=P(1)-abs(P(2));X2(i)=P(1)+abs(P(2));
     end

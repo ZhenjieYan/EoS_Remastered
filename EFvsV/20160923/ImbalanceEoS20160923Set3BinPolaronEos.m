@@ -8,7 +8,7 @@ pixellength=0.7*10^-6*3; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.5810;
+Fudge=1.8273;
 kB=1.380e-23;
 Nsat=770;
 [ KappaTildeT, PTildeT, TTildeT, CV_NkBT , beta_mu_vecT ,Z_vecT ] = IdealFermiEOS();
@@ -235,7 +235,7 @@ ylabel('\kappa/\kappa_0');
 xlabel('U (Hz)');
 
 %% Polaron EoS
-meff=1.3
+meff=1.25
 TTildeS2=T_trap./EFS2BinV;
 mask1=TTildeS2>0;
 mask2=TTildeS2<2;
@@ -249,9 +249,9 @@ axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,2.7,2.1]);
 errorbar(TEoSS2,KappaEoSS2,KappaEoSErrS,'b.','markersize',10,'displayname','Data');
 hold on 
 plot(TTildeT,KappaTildeT,'k-','displayname','m*/m=1');
-plot(TTildeT*meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
+plot(TTildeT/meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
 hold off
-xlim([0,2]);ylim([0.2,1.5])
+xlim([0,1.5]);ylim([0.2,1.5])
 ylabel('\kappa/\kappa_0');
 xlabel('T/T_F');
 legend('show')

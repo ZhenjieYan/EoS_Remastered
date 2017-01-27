@@ -182,7 +182,7 @@ xlabel('U(Hz)');ylabel('E_F(Hz)')
 %errorbar(VS1BinV,EFS1BinV,EFS1ErrBinV);
 errorbar(VBinV,EFS2BinV,EFS2ErrBinV);
 %%
-Vth=1200;
+Vth=1000;
 mask=VBinV>Vth;
 
 Vfit=VBinV(mask);
@@ -234,10 +234,10 @@ ylabel('\kappa/\kappa_0');
 xlabel('U (Hz)');
 
 %% Polaron EoS
-meff=1.3
+meff=1.33
 TTildeS2=T_trap./EFS2BinV;
-mask1=TTildeS2>0;
-mask2=TTildeS2<2;
+% mask1=TTildeS2>0;
+% mask2=TTildeS2<2;
 mask=mask1 & mask2;
 TEoSS2=TTildeS2(mask);
 KappaEoSS2=KappaTildeS2BinV(mask)/1.615;
@@ -248,7 +248,7 @@ axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,2.7,2.1]);
 errorbar(TEoSS2,KappaEoSS2,KappaEoSErrS,'b.','markersize',10,'displayname','Data');
 hold on 
 plot(TTildeT,KappaTildeT,'k-','displayname','m*/m=1');
-plot(TTildeT*meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
+plot(TTildeT/meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
 hold off
 xlim([0,2]);ylim([0.2,1.5])
 ylabel('\kappa/\kappa_0');

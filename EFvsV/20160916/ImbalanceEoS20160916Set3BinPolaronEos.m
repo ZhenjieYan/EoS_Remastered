@@ -8,7 +8,8 @@ pixellength=0.7*10^-6*3; %in m
 sigma0=0.215*10^-12/2; %in m^2
 %load all the functions
 addpath('../../Library');
-Fudge=1.9442;
+%Fudge=1.9442;
+Fudge=1.9703;
 kB=1.380e-23;
 Nsat=770;
 load('/Users/Zhenjie/Data/Processed/2016-09-16/2016-09-16Set3Bin.mat')
@@ -21,8 +22,8 @@ ZS1sortlist={};
 EFS1List={};
 for i=1:length(imglistS1Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,265,456,600],...
-    'ROI2',[320,380,456,470],'TailRange',[325,580],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS1Final{i},'ROI1',[270,250,456,680],...
+    'ROI2',[320,380,456,470],'TailRange',[325,560],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',0,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
     'IfCleanImage',1,'OutlineExtrapolate',1,'IfLookUpTable',1,'Zaveraging',0);%'TailRange',[180,380],
     nS1list=[nS1list;nsort/1e18];%
@@ -33,14 +34,15 @@ for i=1:length(imglistS1Final)
     ZS1sortlist=[ZS1sortlist;Zsort];
     EFS1List=[EFS1List,EFS1];
 end
+
 %% 'ROI2',[300,515,712,930],
 nS2list={};
 ZS2list={};
 Z0S2list=[];
 for i=1:length(imglistS2Final)
     disp(i);
-    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,265,456,600],...
-    'ROI2',[270,428,456,455],'TailRange',[325,580],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
+    [Pt,Kt,nsort,Vsort,Zsort,Ptsel,Ktsel,EFS1,P,zcor,Vsel]=EOS_Online( imglistS2Final{i},'ROI1',[270,250,456,680],...
+    'ROI2',[270,428,456,455],'TailRange',[325,560],'ShowOutline',i==1,'KappaMode',2,'PolyOrder',10,'VrangeFactor',5,'IfHalf',0,'kmax',0.9,'kmin',0.15,...
     'Fudge',Fudge,'BGSubtraction',0,'IfFitExpTail',1,'Nsat',Nsat,'ShowPlot',0,'CutOff',inf,'IfHalf',0,'pixellength',pixellength,'SM',3,'IfBin',0,'BinGridSize',150,...
     'IfCleanImage',1,'OutlineExtrapolate',0,'OutlineIntrapolate',1,'Zaveraging',0,'IfExtrapolateAngle',1);%
     nS2list=[nS2list;nsort/1e18];
@@ -103,10 +105,19 @@ Zprofile.EFS2=EFS2BinZ;
 %% Bin the profile with V
 VS1=0.5*mli*omega^2*(ZS1*1e-6).^2/hh;
 VS2=0.5*mli*omega^2*(ZS2*1e-6).^2/hh;
-EFS1=(1/(2*mli))*hbar^2*(6*pi^2*abs(nS1)*1e18).^(2/3).*sign(nS1)/hh;
-EFS2=(1/(2*mli))*hbar^2*(6*pi^2*abs(nS2)*1e18).^(2/3).*sign(nS2)/hh;
 
-Nbin=150;
+Vth1=7e3;Vth2=10e3;
+V1mask=VS1>Vth1 & VS1<Vth2;
+V2mask=VS2>Vth1 & VS2<Vth2;
+
+nS1Clean=nS1-mean(nS1(V1mask));
+nS2Clean=nS2-mean(nS2(V2mask));
+
+%%
+EFS1=(1/(2*mli))*hbar^2*(6*pi^2*abs(nS1Clean)*1e18).^(2/3).*sign(nS1Clean)/hh;
+EFS2=(1/(2*mli))*hbar^2*(6*pi^2*abs(nS2Clean)*1e18).^(2/3).*sign(nS2Clean)/hh;
+
+Nbin=100;
 VGrid=linspace(0,1.0e4,Nbin+1);
 [VS1BinV,EFS1BinV,VS1ErrBinV,EFS1ErrBinV]=BinGrid(VS1,EFS1,VGrid,0);
 mask=isnan(VS1BinV);
@@ -121,18 +132,7 @@ VS2BinV(mask)=[];
 EFS2BinV1(mask)=[];
 VS2ErrBinV1(mask)=[];
 EFS2ErrBinV1(mask)=[];
-
-Vth=4000;
-VtailS1=VS1BinV(VS1BinV>Vth);
-EFtailS1=EFS1BinV(VS1BinV>Vth);
-
-Vtail2=VS2BinV(VS2BinV>Vth);
-EFtailS2=EFS2BinV1(VS2BinV>Vth);
-
-EFS1BinV=EFS1BinV-mean(EFtailS1);
-EFS2BinV1=EFS2BinV1-mean(EFtailS2);
-
-
+%%
 
 Vth=7000;
 VtailS1=VS1BinV(VS1BinV>Vth);
@@ -151,7 +151,7 @@ EFS2BinV=interp1(VS2BinV,EFS2BinV1,VBinV,'cube');
 EFS2ErrBinV=interp1(VS2BinV,EFS2ErrBinV1,VBinV,'cube');
 nS1BinV=(2*mli*abs(EFS1BinV)*hh/hbar^2).^(3/2)/(6*pi^2)/1e18.*sign(EFS1BinV);
 nS2BinV=(2*mli*abs(EFS2BinV)*hh/hbar^2).^(3/2)/(6*pi^2)/1e18.*sign(EFS2BinV);
-
+%nS1ErrBinV=abs(EFS1ErrBinV./EFS1BinV.*nS1BinV);
 %nS2BinV=nS2BinV-nS2BG;
 
 
@@ -206,22 +206,22 @@ beta_mu_localZ=mu_localZ/T_trap;
 KappaFitZ=interp1(beta_mu_T,KappaTildeT,beta_mu_localZ,'spline');
 KappaFitZ(KappaFitZ<0)=0;
 % get the kappa from image profile
-[KappaTildeS1BinV,KappaTildeS1ErrBinV]=FiniteD( VBinV,VBinV*0,EFS1BinV,EFS1ErrBinV,9);
+[KappaTildeS1BinV,KappaTildeS1ErrBinV]=FiniteD( VBinV,VBinV*0,EFS1BinV,EFS1ErrBinV,7);
 KappaTildeS1BinV=-KappaTildeS1BinV;
 
 figure1 = figure;
-axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,3,1.8]);
-plot(VBinV,KappaTildeS1BinV,'b.');
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,5,3.6]);
+plot(VBinV(1:2:end),KappaTildeS1BinV(1:2:end),'b.','markersize',20);
 hold on
 plot(VBinZ,KappaFitZ,'k-')
 hold off
 title('Majority Compressibility with fit')
-xlim([0,10e3]);ylim([-0.5,2.2])
+xlim([0,8e3]);ylim([-0.5,1.5])
 ylabel('\kappa/\kappa_0');
 xlabel('U (Hz)');
 %%
 
-[KappaTildeS2BinV,KappaTildeS2ErrBinV]=FiniteD( VBinV,VBinV*0,EFS2BinV,EFS2ErrBinV,5);
+[KappaTildeS2BinV,KappaTildeS2ErrBinV]=FiniteD( VBinV,VBinV*0,EFS2BinV,EFS2ErrBinV,6);
 KappaTildeS2BinV=-KappaTildeS2BinV;
 plot(VBinV,KappaTildeS2BinV,'ro');
 xlim([0,10e3])
@@ -248,7 +248,7 @@ axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,2.7,2.1]);
 errorbar(TEoSS2,KappaEoSS2,KappaEoSErrS,'b.','markersize',10,'displayname','Data');
 hold on 
 plot(TTildeT,KappaTildeT,'k-','displayname','m*/m=1');
-plot(TTildeT*meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
+plot(TTildeT/meff,KappaTildeT*meff,'k--','displayname',['m*/m=',num2str(meff)]);
 hold off
 xlim([0,2]);ylim([0.2,1.5])
 ylabel('\kappa/\kappa_0');
@@ -258,7 +258,7 @@ legend('show')
 
 %%
 n_ideal_BinV=IdealGasnV( [mu_trap_S1,T_trap],VBinV );
-
+EF_ideal_BinV=(1/(2*mli))*hbar^2*(6*pi^2*abs(n_ideal_BinV)*1e18).^(2/3)/hh;
 plot(VBinV,n_ideal_BinV,'k-','linewidth',1,'DisplayName','ideal');
 hold on
 plot(VBinV,nS1BinV,'b.','DisplayName','Majority');
@@ -270,10 +270,47 @@ legend show
 
 ylabel('n (um^{-3})');
 xlabel('U (Hz)');
-
-
 %%
-Imbalance=max(nS2BinV)/max(nS1BinV)
+figure1 = figure;
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,2.8,1.8]);
+plot(VBinV/1e3,n_ideal_BinV,'k-','linewidth',1,'DisplayName','ideal');
+hold on
+plot(VBinV/1e3,nS1BinV,'.','DisplayName','Majority','MarkerSize',6,'color',[36,85,189]/255);
+plot(VBinV/1e3,nS2BinV,'.','DisplayName','Minority','MarkerSize',6,'color',[201,67,52]/255);
+%plot(VBinV/1e3,n_ideal_BinV+0.6150*nS2BinV,'g-','linewidth',1,'DisplayName','ENS EoS, A=-0.615');
+hold off
+xlim([0,8]);ylim([-0.02,0.3])
+set(axes1,'Xtick',[0 2 4 6 8],'Ytick',[0,0.1,0.2,0.3],'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0])
+%%
+figure1 = figure;
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,5,3.6]);
+plot(VBinZ/1e3,KappaFitZ,'k-','linewidth',2)
+hold on
+plot(VBinV(1:2:end)/1e3,KappaTildeS1BinV(1:2:end),'.','DisplayName','Majority','MarkerSize',15,'color',[36,85,189]/255);
+
+xlim([0,8]);ylim([-0.3,1.5])
+set(axes1,'Xtick',[0 2 4 6 8],'Ytick',[0,0.5,1,1.5],'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0])
+%%
+nENS=n_ideal_BinV+0.6150*nS2BinV;
+EFENS=(1/(2*mli))*hbar^2*(6*pi^2*abs(nENS)*1e18).^(2/3)/hh;
+EFENS(VBinV>3000)=EF_ideal_BinV(VBinV>3000);
+figure1 = figure;
+axes1 = axes('Parent',figure1,'unit','inch','position',[1,1,5,3.6]);
+plot(VBinV/1e3,EFENS/1e3,'g-','linewidth',2,'DisplayName','ENS EoS, A=-0.615');
+hold on
+
+plot(VBinV/1e3,EF_ideal_BinV/1e3,'k-','linewidth',2,'DisplayName','ideal');
+plot(VBinV(1:2:end)/1e3,EFS1BinV(1:2:end)/1e3,'b.','DisplayName','Majority','MarkerSize',15);
+plot(VBinV(1:2:end)/1e3,EFS2BinV(1:2:end)/1e3,'r.','DisplayName','Minority','MarkerSize',15);
+hold off
+xlim([0,8]);ylim([-1,6.6])
+legend('show')
+set(axes1,'Xtick',[0 2 4 6 8],'Ytick',[0,2,4,6],'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0])
+%% Derivative of EF_ENS
+[KappaTildeENS,~]=FiniteD( VBinV,VBinV*0,EFENS,EFENS*0,7);
+KappaTildeENS=-KappaTildeENS;
+plot(VBinV,KappaTildeENS)
+
 %% Create the unfolded kappa vs Z
 
 ZList=[];
