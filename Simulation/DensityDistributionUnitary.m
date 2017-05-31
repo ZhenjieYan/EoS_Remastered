@@ -93,11 +93,13 @@ hold off
 ylim([0,5])
 xlabel('U (kHz)');ylabel('P/P_0')
 %%
+plot(Vsort/hh,nsort/1e18,'r.','markersize',9);
+xlim([0,9000])
+xlabel('U (kHz)');ylabel('n(um^{-3})')
+%%
 plot(Vsort,Kt,'r.','markersize',9);
-hold on
-plot(Vz,kappaz)
-hold off
 ylim([0,5])
+xlabel('U (kHz)');ylabel('n')
 %%
 %filelist={'Ttilde_trap=0.068214.mat';'Ttilde_trap=0.15888.mat';'Ttilde_trap=0.25917.mat';'Ttilde_trap=0.26959.mat'};
 %filelist={'Ttilde_trap=0.06617_Sharp.mat';'Ttilde_trap=0.15224_Sharp.mat';'Ttilde_trap=0.18918_Sharp.mat';'Ttilde_trap=0.38342_Sharp.mat';'Ttilde_trap=0.6192_Sharp.mat';'Ttilde_trap=0.73979_Sharp.mat';'Ttilde_trap=1.5743_Sharp.mat'};
